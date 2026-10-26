@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Manejo de Seguridad y Sesión
     async function verificarSesion() {
         try {
-            const res = await fetch('/api/auth/me');
+            const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
             if (!res.ok) {
                 window.location.replace('/admin/login.html');
                 return false;
@@ -100,6 +100,34 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.replace('/admin/login.html');
             return false;
         }
+    }
+
+    // Cliente HTTP centralizado con manejo automático de CSRF, cookies y caducidad de sesión
+    async function authFetch(url, options = {}) {
+        options.credentials = 'same-origin';
+        options.headers = options.headers || {};
+
+        const metodo = (options.method || 'GET').toUpperCase();
+        if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(metodo)) {
+            const token = await obtenerCsrfToken();
+            if (token && !options.headers['X-XSRF-TOKEN']) {
+                options.headers['X-XSRF-TOKEN'] = token;
+            }
+        }
+
+        const res = await fetch(url, options);
+
+        if (res.status === 401) {
+            mostrarToast('Tu sesión ha expirado o el servidor se reinició. Redirigiendo a inicio de sesión...', 'danger');
+            cerrarModalFormulario();
+            cerrarModalDelete();
+            setTimeout(() => {
+                window.location.replace('/admin/login.html');
+            }, 1200);
+            throw new Error('Sesión no autorizada o expirada');
+        }
+
+        return res;
     }
 
     async function cerrarSesion() {
@@ -134,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res = await fetch('/api/auth/csrf');
+            const res = await fetch('/api/auth/csrf', { credentials: 'same-origin' });
             if (res.ok) {
                 const data = await res.json();
                 if (data.token) {
@@ -166,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Cargar Estadísticas
     async function cargarEstadisticas() {
         try {
-            const res = await fetch('/api/admin/peptidos/stats');
+            const res = await authFetch('/api/admin/peptidos/stats');
             if (res.ok) {
                 const stats = await res.json();
                 if (statTotalCompuestos) statTotalCompuestos.textContent = stats.totalCompuestos;
@@ -204,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
-            const res = await fetch('/api/admin/peptidos');
+            const res = await authFetch('/api/admin/peptidos');
             if (!res.ok) throw new Error('Error al consultar el catálogo');
 
             todosLosPeptidos = await res.json();
@@ -223,7 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </tr>
                 `;
             }
-            mostrarToast('Error al conectar con el servidor', 'danger');
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error al conectar con el servidor', 'danger');
+            }
         }
     }
 
@@ -388,15 +418,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
 
         try {
-            const token = await obtenerCsrfToken();
             const formData = new FormData();
             formData.append('file', file);
 
-            const res = await fetch('/api/admin/peptidos/upload-imagen', {
+            const res = await authFetch('/api/admin/peptidos/upload-imagen', {
                 method: 'POST',
-                headers: {
-                    'X-XSRF-TOKEN': token || ''
-                },
                 body: formData
             });
 
@@ -412,7 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             ocultarPreviewImagen();
-            mostrarToast('Error de red al intentar subir la imagen.', 'danger');
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error de red al intentar subir la imagen.', 'danger');
+            }
         } finally {
             if (uploadStatus) uploadStatus.style.display = 'none';
         }
@@ -462,13 +490,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const method = esEdicion ? 'PUT' : 'POST';
 
         try {
-            const token = await obtenerCsrfToken();
-            const res = await fetch(url, {
+            const res = await authFetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-XSRF-TOKEN': token || ''
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
@@ -486,27 +512,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         todosLosPeptidos[idx] = data;
                     }
                 } else {
-                    // Colocar el nuevo compuesto AL INICIO de la lista (arriba del todo)
                     todosLosPeptidos.unshift(data);
                 }
 
-                // Limpiar filtros para que el nuevo compuesto se muestre de inmediato en pantalla
                 if (searchInput) searchInput.value = '';
                 if (categoryFilter) categoryFilter.value = '';
                 actualizarOpcionesCategorias();
                 aplicarFiltros();
 
-                // Resaltar la fila recién agregada o modificada
                 resaltarFila(data.id || id);
 
-                // Refrescar métricas y notificar a otras pestañas
                 cargarEstadisticas();
                 notificarSincronizacion(esEdicion ? 'UPDATE' : 'CREATE', data.id || id);
             } else {
                 mostrarToast(data.mensaje || 'Error al guardar los datos.', 'danger');
             }
         } catch (error) {
-            mostrarToast('Error de conexión con el servidor al guardar.', 'danger');
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error de conexión con el servidor al guardar.', 'danger');
+            }
         } finally {
             setLoadingGuardar(false);
         }
@@ -636,13 +660,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoadingEliminar(true);
 
         try {
-            const token = await obtenerCsrfToken();
             const idAEliminar = peptidoSeleccionadoParaEliminar;
-            const res = await fetch(`/api/admin/peptidos/${idAEliminar}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-XSRF-TOKEN': token || ''
-                }
+            const res = await authFetch(`/api/admin/peptidos/${idAEliminar}`, {
+                method: 'DELETE'
             });
 
             if (res.ok) {
@@ -661,7 +681,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarToast(data.mensaje || 'Error al eliminar el registro.', 'danger');
             }
         } catch (error) {
-            mostrarToast('Error de conexión con el servidor al eliminar.', 'danger');
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error de conexión con el servidor al eliminar.', 'danger');
+            }
         } finally {
             setLoadingEliminar(false);
         }
