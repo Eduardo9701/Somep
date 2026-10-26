@@ -35,7 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const formPeptidoId = document.getElementById('form-peptido-id');
     const formImagen = document.getElementById('form-imagen');
     const formImagenFile = document.getElementById('form-imagen-file');
-    const btnTriggerUpload = document.getElementById('btn-trigger-upload');
+    const dropzoneArea = document.getElementById('dropzone-area');
+    const dropzoneEmptyState = document.getElementById('dropzone-empty-state');
+    const btnChangeImage = document.getElementById('btn-change-image');
     const uploadStatus = document.getElementById('upload-status');
     const imagePreviewContainer = document.getElementById('image-preview-container');
     const imagePreviewImg = document.getElementById('image-preview-img');
@@ -332,34 +334,41 @@ document.addEventListener('DOMContentLoaded', () => {
     function mostrarPreviewImagen(url, nombre) {
         if (!imagePreviewContainer || !imagePreviewImg) return;
         imagePreviewImg.src = url;
-        if (imagePreviewName) imagePreviewName.textContent = nombre || 'Imagen seleccionada';
+        if (imagePreviewName) imagePreviewName.textContent = nombre || 'Imagen del compuesto';
         imagePreviewContainer.style.display = 'flex';
+        if (dropzoneEmptyState) dropzoneEmptyState.style.display = 'none';
+        if (uploadStatus) uploadStatus.style.display = 'none';
     }
 
     function ocultarPreviewImagen() {
         if (imagePreviewImg) imagePreviewImg.src = '';
         if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
+        if (dropzoneEmptyState) dropzoneEmptyState.style.display = 'block';
+        if (uploadStatus) uploadStatus.style.display = 'none';
+        if (formImagen) formImagen.value = '';
         if (formImagenFile) formImagenFile.value = '';
     }
 
-    // Subida de imagen desde el dispositivo
+    // Subida de imagen directa desde el dispositivo
     async function subirImagenDesdeDispositivo(event) {
-        const file = event.target.files[0];
+        const file = event.target ? (event.target.files ? event.target.files[0] : null) : (event.files ? event.files[0] : null);
         if (!file) return;
 
-        if (!file.type.startsWith('image/')) {
+        if (!file.type || !file.type.startsWith('image/')) {
             mostrarToast('Por favor selecciona un archivo de imagen válido (JPG, PNG, WEBP, SVG o GIF).', 'danger');
-            formImagenFile.value = '';
+            if (formImagenFile) formImagenFile.value = '';
             return;
         }
 
         if (file.size > 15 * 1024 * 1024) {
             mostrarToast('La imagen supera el límite permitido de 15 MB.', 'danger');
-            formImagenFile.value = '';
+            if (formImagenFile) formImagenFile.value = '';
             return;
         }
 
-        uploadStatus.style.display = 'inline-flex';
+        if (uploadStatus) uploadStatus.style.display = 'flex';
+        if (dropzoneEmptyState) dropzoneEmptyState.style.display = 'none';
+        if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
 
         try {
             const token = await obtenerCsrfToken();
@@ -377,16 +386,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (res.ok && data.url) {
-                formImagen.value = data.url;
+                if (formImagen) formImagen.value = data.url;
                 mostrarPreviewImagen(data.url, file.name);
                 mostrarToast('Imagen subida exitosamente desde tu dispositivo.', 'success');
             } else {
+                ocultarPreviewImagen();
                 mostrarToast(data.mensaje || 'Error al subir la imagen al servidor.', 'danger');
             }
         } catch (error) {
+            ocultarPreviewImagen();
             mostrarToast('Error de red al intentar subir la imagen.', 'danger');
         } finally {
-            uploadStatus.style.display = 'none';
+            if (uploadStatus) uploadStatus.style.display = 'none';
         }
     }
 
@@ -640,29 +651,52 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnCancelForm) btnCancelForm.addEventListener('click', cerrarModalFormulario);
         if (btnSavePeptido) btnSavePeptido.addEventListener('click', guardarPeptido);
 
-        // Subida de imagen desde el dispositivo
-        if (btnTriggerUpload && formImagenFile) {
-            btnTriggerUpload.addEventListener('click', () => formImagenFile.click());
-        }
-        if (formImagenFile) {
-            formImagenFile.addEventListener('change', subirImagenDesdeDispositivo);
-        }
-        if (btnRemovePreview) {
-            btnRemovePreview.addEventListener('click', () => {
-                if (formImagen) formImagen.value = '';
-                ocultarPreviewImagen();
+        // Control interactivo de subida de imagen desde el dispositivo
+        if (dropzoneArea && formImagenFile) {
+            dropzoneArea.addEventListener('click', (e) => {
+                // Si el clic no fue en los botones internos de quitar o cambiar
+                if (!e.target.closest('#btn-remove-preview') && !e.target.closest('#btn-change-image')) {
+                    formImagenFile.click();
+                }
+            });
+
+            // Soporte Drag & Drop
+            dropzoneArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzoneArea.style.borderColor = 'var(--primary)';
+                dropzoneArea.style.backgroundColor = '#F5EFEB';
+            });
+            dropzoneArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropzoneArea.style.borderColor = '#C5A059';
+                dropzoneArea.style.backgroundColor = '#FAF8F5';
+            });
+            dropzoneArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzoneArea.style.borderColor = '#C5A059';
+                dropzoneArea.style.backgroundColor = '#FAF8F5';
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    formImagenFile.files = e.dataTransfer.files;
+                    subirImagenDesdeDispositivo({ target: formImagenFile });
+                }
             });
         }
 
-        // Entrada manual en formImagen
-        if (formImagen) {
-            formImagen.addEventListener('input', (e) => {
-                const val = e.target.value.trim();
-                if (val) {
-                    mostrarPreviewImagen(val, 'Imagen manual');
-                } else {
-                    ocultarPreviewImagen();
-                }
+        if (btnChangeImage && formImagenFile) {
+            btnChangeImage.addEventListener('click', (e) => {
+                e.stopPropagation();
+                formImagenFile.click();
+            });
+        }
+
+        if (formImagenFile) {
+            formImagenFile.addEventListener('change', subirImagenDesdeDispositivo);
+        }
+
+        if (btnRemovePreview) {
+            btnRemovePreview.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ocultarPreviewImagen();
             });
         }
 

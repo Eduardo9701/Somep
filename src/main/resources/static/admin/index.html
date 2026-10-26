@@ -6,7 +6,7 @@
   <title>Panel Administrativo — SOMEP</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="/assets/logo-somep.svg">
-  <link rel="stylesheet" href="/css/admin.css?v=1.0.1">
+  <link rel="stylesheet" href="/css/admin.css?v=1.0.2">
 </head>
 <body>
 
@@ -196,39 +196,47 @@
             <input type="text" id="form-fuente" class="form-input" placeholder="ej. FDA · NIH PubChem · PMID...">
           </div>
 
-          <!-- Control para subir imagen desde el dispositivo -->
-          <div class="form-group" style="margin-top: 1rem; border: 1px dashed var(--border-color); padding: 1.25rem; border-radius: var(--radius-sm); background-color: #FAFAFA;">
-            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-              <span>Fotografía o Infografía del Compuesto</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">Sube desde tu dispositivo o ingresa una ruta</span>
-            </label>
+          <!-- Control directo para subir imagen desde el dispositivo -->
+          <div class="form-group" style="margin-top: 1.25rem;">
+            <label class="form-label">Fotografía o imagen del compuesto</label>
             
-            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
+            <!-- Campo oculto donde se guarda la URL resultante para la base de datos -->
+            <input type="hidden" id="form-imagen" value="">
+
+            <!-- Zona de selección y subida de archivo local -->
+            <div id="dropzone-area" style="border: 2px dashed #C5A059; border-radius: var(--radius-md); padding: 1.5rem; text-align: center; background-color: #FAF8F5; cursor: pointer; transition: var(--transition);">
               <input type="file" id="form-imagen-file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" style="display: none;">
               
-              <button type="button" class="btn btn-secondary" id="btn-trigger-upload" style="border: 1px solid var(--primary); color: var(--primary); font-size: 0.85rem;">
-                📷 Subir imagen desde el dispositivo
-              </button>
-              
-              <span id="upload-status" style="font-size: 0.85rem; color: var(--text-muted); display: none;">
-                <span class="spinner" style="border-top-color: var(--primary); width: 0.9rem; height: 0.9rem; margin-right: 0.35rem;"></span>
-                Subiendo imagen...
-              </span>
-            </div>
-
-            <!-- Previsualización interactiva -->
-            <div id="image-preview-container" style="display: none; align-items: center; gap: 1rem; margin-bottom: 0.75rem; padding: 0.5rem; background: #FFF; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-              <img id="image-preview-img" src="" alt="Vista previa" style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-              <div style="flex: 1; overflow: hidden;">
-                <p id="image-preview-name" style="font-size: 0.85rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">imagen.jpg</p>
-                <p style="font-size: 0.75rem; color: var(--secondary); font-weight: 500;">✓ Imagen vinculada correctamente</p>
+              <div id="dropzone-empty-state">
+                <div style="font-size: 2.25rem; margin-bottom: 0.5rem;" aria-hidden="true">📸</div>
+                <p style="font-weight: 600; color: var(--primary); margin-bottom: 0.35rem; font-size: 0.95rem;">
+                  Toca o haz clic aquí para subir una imagen desde tu dispositivo
+                </p>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                  Formatos compatibles: JPG, PNG, WEBP, SVG (máx. 15 MB)
+                </p>
               </div>
-              <button type="button" id="btn-remove-preview" class="btn btn-action btn-delete" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" title="Quitar imagen">✕</button>
-            </div>
 
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">Ruta / URL:</span>
-              <input type="text" id="form-imagen" class="form-input" placeholder="ej. /assets/images/wolverine.jpeg o generada al subir archivo" style="font-size: 0.85rem; padding: 0.45rem 0.75rem;">
+              <!-- Indicador de subida -->
+              <div id="upload-status" style="display: none; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem;">
+                <span class="spinner" style="border-top-color: var(--primary); width: 1.25rem; height: 1.25rem;"></span>
+                <span style="font-weight: 600; color: var(--primary); font-size: 0.9rem;">Subiendo imagen desde tu dispositivo...</span>
+              </div>
+
+              <!-- Vista previa de la imagen cargada -->
+              <div id="image-preview-container" style="display: none; align-items: center; justify-content: space-between; gap: 1rem; text-align: left; background: #FFFFFF; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-top: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; overflow: hidden;">
+                  <img id="image-preview-img" src="" alt="Vista previa" style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); flex-shrink: 0;">
+                  <div style="overflow: hidden;">
+                    <p id="image-preview-name" style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">imagen.jpg</p>
+                    <p style="font-size: 0.78rem; color: var(--secondary); font-weight: 600;">✓ Imagen vinculada correctamente</p>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                  <button type="button" id="btn-change-image" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Cambiar foto</button>
+                  <button type="button" id="btn-remove-preview" class="btn btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Quitar</button>
+                </div>
+              </div>
             </div>
           </div>
         </form>
@@ -290,6 +298,6 @@
   <!-- Contenedor Toast para Notificaciones -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-  <script src="/js/admin.js?v=1.0.1"></script>
+  <script src="/js/admin.js?v=1.0.2"></script>
 </body>
 </html>
