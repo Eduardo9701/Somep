@@ -200,11 +200,14 @@ a {
 }
 
 .brand-logo {
-  width: 54px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
-  border-radius: var(--radius-sm);
-  filter: drop-shadow(0 2px 4px rgba(74, 21, 75, 0.15));
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
 }
 
 .brand-titles {
@@ -1499,12 +1502,15 @@ a {
 }
 
 .footer-logo {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-  background-color: #FFFFFF;
-  border-radius: var(--radius-sm);
-  padding: 2px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  filter: none;
 }
 
 .footer-brand-title {
