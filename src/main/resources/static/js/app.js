@@ -2,15 +2,16 @@
  * ============================================================================
  * SOMEP — SOCIEDAD MEXICANA DE PÉPTIDOS
  * Aplicación Web Educativa e Interactiva — Catálogo de Péptidos y Moléculas
- * Vanilla JavaScript ES6+ — Consumo de API REST, Filtros y Accesibilidad
+ * Vanilla JavaScript ES6+ — Consumo de API REST, Filtros, Paginación y Accesibilidad
  * ============================================================================
  */
 
 (() => {
   'use strict';
 
-  // Configuración de Endpoints
+  // Configuración de Endpoints y Paginación
   const API_BASE = '/api/peptidos';
+  const ITEMS_PER_PAGE = 6;
 
   // Estado de la Aplicación
   const state = {
@@ -19,6 +20,8 @@
     categories: [],
     activeCategory: 'Todos',
     searchQuery: '',
+    currentPage: 1,
+    itemsPerPage: ITEMS_PER_PAGE,
     selectedPeptido: null,
     lastFocusedElement: null,
     isLoading: false
@@ -46,6 +49,11 @@
     errorState: document.getElementById('error-state'),
     errorMessage: document.getElementById('error-message'),
     emptyState: document.getElementById('empty-state'),
+
+    // Paginación
+    paginationNav: document.getElementById('pagination-nav'),
+    paginationInfo: document.getElementById('pagination-info'),
+    paginationControls: document.getElementById('pagination-controls'),
 
     // Modal de Detalle
     modal: document.getElementById('detail-modal'),
@@ -90,6 +98,7 @@
       
       searchTimeout = setTimeout(() => {
         state.searchQuery = val;
+        state.currentPage = 1; // Reiniciar a página 1 en cada búsqueda
         fetchCatalog();
       }, 250);
     });
@@ -99,6 +108,7 @@
       DOM.searchInput.value = '';
       DOM.clearSearchBtn.hidden = true;
       state.searchQuery = '';
+      state.currentPage = 1;
       DOM.searchInput.focus();
       fetchCatalog();
     });
@@ -109,6 +119,7 @@
       DOM.clearSearchBtn.hidden = true;
       state.searchQuery = '';
       state.activeCategory = 'Todos';
+      state.currentPage = 1;
       fetchCatalog();
     };
 
@@ -200,7 +211,6 @@
   async function fetchInitialData() {
     showLoading();
     try {
-      // Peticiones paralelas
       const [peptidosRes, categoriasRes] = await Promise.all([
         fetch(API_BASE),
         fetch(`${API_BASE}/categorias`)
@@ -216,16 +226,13 @@
       if (categoriasRes.ok) {
         state.categories = await categoriasRes.json();
       } else {
-        // Fallback: extraer categorías únicas del catálogo
         const cats = new Set(state.allPeptidos.map(p => p.categoria));
         state.categories = Array.from(cats);
       }
 
-      // Actualizar contadores y métricas institucionales
       DOM.statTotal.textContent = state.allPeptidos.length;
       DOM.statCategories.textContent = state.categories.length;
 
-      // Renderizar interfaz
       renderCategoryChips();
       renderCatalog();
     } catch (err) {
@@ -257,7 +264,7 @@
 
       state.filteredPeptidos = await response.json();
       renderCatalog();
-      renderCategoryChips(); // Actualiza conteos en chips
+      renderCategoryChips();
     } catch (err) {
       console.error('Error al filtrar catálogo:', err);
       showError(err.message);
@@ -265,7 +272,7 @@
   }
 
   /**
-   * Renderiza las fichas en la cuadrícula
+   * Renderiza las fichas paginadas (a partir de 6 por página)
    */
   function renderCatalog() {
     hideAllStates();
@@ -273,6 +280,12 @@
 
     const list = state.filteredPeptidos;
     const total = list.length;
+    const totalPages = Math.ceil(total / state.itemsPerPage) || 1;
+
+    // Ajustar página actual si excede el total de páginas
+    if (state.currentPage > totalPages) {
+      state.currentPage = totalPages;
+    }
 
     // Resumen de resultados
     if (total === 1) {
@@ -285,15 +298,90 @@
     DOM.resetAllBtn.hidden = !hasFilters;
 
     if (total === 0) {
+      DOM.paginationNav.hidden = true;
       showEmpty();
       return;
     }
 
-    // Creación segura de tarjetas DOM (sin innerHTML para datos no confiables)
-    list.forEach(peptido => {
+    // Segmentar según la página actual (Paginación a partir de 6)
+    const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+    const endIndex = Math.min(startIndex + state.itemsPerPage, total);
+    const pageItems = list.slice(startIndex, endIndex);
+
+    // Renderizar tarjetas de la página actual
+    pageItems.forEach(peptido => {
       const card = createCompoundCard(peptido);
       DOM.cardsGrid.appendChild(card);
     });
+
+    // Renderizar controles de paginación
+    renderPagination(total, totalPages, startIndex, endIndex);
+  }
+
+  /**
+   * Construye los controles accesibles de paginación
+   */
+  function renderPagination(total, totalPages, startIndex, endIndex) {
+    if (total <= state.itemsPerPage) {
+      DOM.paginationNav.hidden = true;
+      return;
+    }
+
+    DOM.paginationNav.hidden = false;
+    DOM.paginationInfo.innerHTML = `Mostrando <strong>${startIndex + 1}–${endIndex}</strong> de <strong>${total}</strong> compuestos (Página ${state.currentPage} de ${totalPages})`;
+
+    DOM.paginationControls.innerHTML = '';
+
+    const goToPage = (page) => {
+      if (page < 1 || page > totalPages || page === state.currentPage) return;
+      state.currentPage = page;
+      renderCatalog();
+      // Desplazamiento suave al inicio de la cuadrícula
+      const target = document.getElementById('search-input');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
+    // Botón "Anterior"
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.className = 'pagination-btn';
+    prevBtn.disabled = state.currentPage === 1;
+    prevBtn.setAttribute('aria-label', 'Página anterior');
+    prevBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      <span>Anterior</span>
+    `;
+    prevBtn.addEventListener('click', () => goToPage(state.currentPage - 1));
+    DOM.paginationControls.appendChild(prevBtn);
+
+    // Botones numéricos de página
+    for (let p = 1; p <= totalPages; p++) {
+      const pageBtn = document.createElement('button');
+      pageBtn.type = 'button';
+      pageBtn.className = `pagination-btn ${p === state.currentPage ? 'active' : ''}`;
+      pageBtn.textContent = p;
+      pageBtn.setAttribute('aria-label', `Ir a página ${p}`);
+      if (p === state.currentPage) {
+        pageBtn.setAttribute('aria-current', 'page');
+      }
+      pageBtn.addEventListener('click', () => goToPage(p));
+      DOM.paginationControls.appendChild(pageBtn);
+    }
+
+    // Botón "Siguiente"
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'pagination-btn';
+    nextBtn.disabled = state.currentPage === totalPages;
+    nextBtn.setAttribute('aria-label', 'Página siguiente');
+    nextBtn.innerHTML = `
+      <span>Siguiente</span>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    `;
+    nextBtn.addEventListener('click', () => goToPage(state.currentPage + 1));
+    DOM.paginationControls.appendChild(nextBtn);
   }
 
   /**
@@ -420,17 +508,16 @@
       chip.addEventListener('click', () => {
         if (state.activeCategory === name) return;
         state.activeCategory = name;
+        state.currentPage = 1; // Reiniciar a página 1 al cambiar de categoría
         fetchCatalog();
       });
 
       return chip;
     };
 
-    // Chip general: "Todos"
     const totalCount = state.allPeptidos.length;
     DOM.categoryChips.appendChild(createChip('Todos', totalCount));
 
-    // Chips específicos
     state.categories.forEach(cat => {
       const count = state.allPeptidos.filter(p => p.categoria.toLowerCase() === cat.toLowerCase()).length;
       DOM.categoryChips.appendChild(createChip(cat, count));
@@ -443,7 +530,6 @@
   function openModal(peptido) {
     state.selectedPeptido = peptido;
 
-    // Poblar textos de manera segura
     DOM.modalCategory.textContent = peptido.categoria;
     DOM.modalCategory.setAttribute('data-cat', peptido.categoria);
     DOM.modalTitle.textContent = peptido.nombre;
@@ -462,7 +548,6 @@
     DOM.modalClave.textContent = peptido.clave;
     DOM.modalFuente.textContent = peptido.fuente || 'Información técnica institucional de SOMEP.';
 
-    // Infografía gráfica
     if (peptido.imagenUrl) {
       DOM.modalInfographicImg.src = peptido.imagenUrl;
       DOM.modalInfographicImg.alt = `Infografía científica oficial de ${peptido.nombre}`;
@@ -471,14 +556,11 @@
       DOM.tabInfographicBtn.hidden = true;
     }
 
-    // Regresar a la primera pestaña
     switchModalTab('data');
 
-    // Mostrar modal y bloquear scroll del body
     DOM.modal.hidden = false;
     document.body.classList.add('modal-open');
 
-    // Dar foco accesible al botón de cierre
     DOM.modalCloseBtn.focus();
   }
 
@@ -490,7 +572,6 @@
     document.body.classList.remove('modal-open');
     state.selectedPeptido = null;
 
-    // Restaurar foco al elemento que activó el modal
     if (state.lastFocusedElement) {
       state.lastFocusedElement.focus();
     }
@@ -548,6 +629,7 @@
     DOM.errorMessage.textContent = msg || 'Ocurrió un error al procesar la solicitud.';
     DOM.cardsGrid.innerHTML = '';
     DOM.resultsCount.textContent = 'Error de conexión';
+    DOM.paginationNav.hidden = true;
   }
 
   function showEmpty() {
@@ -556,6 +638,7 @@
     DOM.errorState.hidden = true;
     DOM.emptyState.hidden = false;
     DOM.cardsGrid.innerHTML = '';
+    DOM.paginationNav.hidden = true;
   }
 
 })();

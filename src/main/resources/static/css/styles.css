@@ -839,6 +839,90 @@ a {
 }
 
 /* ==========================================================================
+   Controles de Paginación del Catálogo Científico
+   ========================================================================== */
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--color-border);
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.pagination-nav[hidden] {
+  display: none !important;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.pagination-info strong {
+  color: var(--color-purple);
+  font-weight: 700;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--color-purple);
+  background-color: var(--color-purple-subtle);
+  color: var(--color-purple);
+}
+
+.pagination-btn.active {
+  background-color: var(--color-purple);
+  color: #FFFFFF;
+  border-color: var(--color-purple);
+  box-shadow: 0 2px 6px rgba(74, 21, 75, 0.25);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #F5F4F0;
+  border-color: var(--color-border-subtle);
+  color: var(--color-text-light);
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 40px;
+  color: var(--color-text-light);
+  font-weight: 700;
+}
+
+/* ==========================================================================
    SECCIÓN ACADEMIA: CURSOS CON CONSTANCIA, CONFERENCIAS Y SEMINARIOS
    ========================================================================== */
 .academy-section {
