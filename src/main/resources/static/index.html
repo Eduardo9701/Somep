@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOMEP — Catálogo Científico e Interactivo de Péptidos y Moléculas</title>
+  
+  <meta name="description" content="Glosario médico-educativo y catálogo científico oficial de la Sociedad Mexicana de Péptidos (SOMEP). Consulta objetiva y referenciada de péptidos, moléculas y nutrientes.">
+  <meta name="theme-color" content="#4A154B">
+
+  <!-- Favicon e Iconografía -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo-somep.svg">
+  <link rel="alternate icon" type="image/jpeg" href="assets/logo-somep.jpeg">
+
+  <!-- Tipografía Web Optimizada -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- Estilos CSS3 Puros -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Cintillo de Aviso Médico Institucional Obligatorio -->
+  <div class="top-disclaimer-banner" role="banner" aria-label="Aviso Médico Oficial">
+    <div class="container banner-content">
+      <span class="banner-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z"/>
+        </svg>
+      </span>
+      <p class="banner-text">
+        <strong>Aviso Institucional:</strong> “Información educativa. No sustituye una valoración médica.”
+      </p>
+      <span class="banner-tag">Uso Exclusivo Académico y de Consulta</span>
+    </div>
+  </div>
+
+  <!-- Cabecera Institucional SOMEP -->
+  <header class="site-header" role="banner">
+    <div class="container header-container">
+      <a href="./" class="brand-link" aria-label="SOMEP - Inicio del Catálogo">
+        <img src="assets/logo-somep.jpeg" alt="Logotipo Oficial SOMEP" class="brand-logo" width="60" height="60" onerror="this.src='assets/logo-somep.svg'">
+        <div class="brand-titles">
+          <h1 class="brand-acronym">SOMEP</h1>
+          <span class="brand-tagline">SOCIEDAD MEXICANA DE PÉPTIDOS</span>
+          <span class="brand-sub">Comunidad de Formación, Vinculación e Investigación Científica</span>
+        </div>
+      </a>
+
+      <div class="header-contact">
+        <div class="contact-pill">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+          </svg>
+          <span>Vinculación: <strong>55 7924 7494</strong></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Área Introductoria y Hero Científico -->
+  <section class="hero-section" aria-labelledby="hero-title">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          PORTAFOLIO CIENTÍFICO Y GLOSARIO MÉDICO-EDUCATIVO
+        </div>
+        <h2 id="hero-title" class="hero-heading">
+          Catálogo Interactivo de Péptidos y Moléculas
+        </h2>
+        <p class="hero-description">
+          Consulte la caracterización técnica, evidencia clínica, advertencias de seguridad y estado regulatorio de péptidos, nutrientes y coenzimas. Una iniciativa orientada a profesionales de la salud para fundamentar decisiones con rigor y transparencia.
+        </p>
+
+        <!-- Métricas Rápidas -->
+        <div class="hero-stats" role="region" aria-label="Estadísticas del catálogo">
+          <div class="stat-card">
+            <span class="stat-number" id="stat-total">--</span>
+            <span class="stat-label">Compuestos Indexados</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="stat-categories">--</span>
+            <span class="stat-label">Categorías Científicas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Revisión Documentada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contenido Principal: Búsqueda, Filtros y Cuadrícula -->
+  <main class="container main-content" id="catalogo">
+    
+    <!-- Barra de Búsqueda y Herramientas -->
+    <section class="search-section" aria-label="Herramientas de Búsqueda">
+      <div class="search-box">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          <input 
+            type="search" 
+            id="search-input" 
+            placeholder="Buscar por nombre, clasificación, mecanismo o palabra clave (ej. glucosa, BPC, ACTH)..." 
+            aria-label="Buscar compuestos en el catálogo"
+            autocomplete="off">
+          <button type="button" id="clear-search-btn" class="clear-btn" aria-label="Limpiar búsqueda" hidden>
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros por Categoría -->
+      <nav class="categories-nav" aria-label="Filtro por categorías">
+        <span class="categories-label">Clasificación:</span>
+        <div class="category-chips" id="category-chips" role="radiogroup" aria-label="Filtrar por categoría">
+          <!-- Generado dinámicamente -->
+        </div>
+      </nav>
+
+      <!-- Resumen de Resultados -->
+      <div class="results-summary" aria-live="polite">
+        <span id="results-count">Cargando catálogo...</span>
+        <button type="button" id="reset-all-btn" class="btn-text-link" hidden>
+          Restablecer filtros
+        </button>
+      </div>
+    </section>
+
+    <!-- Estados de la Interfaz: Carga, Error, Sin Resultados -->
+    <div id="status-container" class="status-container" aria-live="polite">
+      <!-- Estado de Carga -->
+      <div id="loading-state" class="state-box loading-box">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="state-title">Consultando base de datos científica...</p>
+        <p class="state-sub">Obteniendo registros verificados de SOMEP.</p>
+      </div>
+
+      <!-- Estado de Error de Red o Servidor -->
+      <div id="error-state" class="state-box error-box" hidden>
+        <svg class="state-icon" viewBox="0 0 24 24" width="48" height="48" fill="#D32F2F" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <h3 class="state-title">No fue posible conectar con el servidor</h3>
+        <p class="state-sub" id="error-message">Verifique que el servicio de Spring Boot y MySQL estén ejecutándose localmente.</p>
+        <button type="button" id="retry-btn" class="btn-primary">Reintentar conexión</button>
+      </div>
+
+      <!-- Estado de Ausencia de Resultados -->
+      <div id="empty-state" class="state-box empty-box" hidden>
+        <svg class="state-icon" viewBox="0 0 24 24" width="48" height="48" fill="#C5A059" aria-hidden="true">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <h3 class="state-title">No se encontraron compuestos coincidentes</h3>
+        <p class="state-sub">Intente ajustar los términos de búsqueda o seleccionar otra categoría científica.</p>
+        <button type="button" id="clear-filters-btn" class="btn-secondary">Restablecer todos los filtros</button>
+      </div>
+    </div>
+
+    <!-- Cuadrícula Dinámica de Tarjetas de Compuestos -->
+    <section class="cards-grid" id="cards-grid" aria-label="Lista de compuestos científicos">
+      <!-- Tarjetas renderizadas de forma segura por JavaScript vanilla -->
+    </section>
+
+  </main>
+
+  <!-- Modal Accesible para Vista de Detalle y Ficha Ampliada -->
+  <div id="detail-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-container">
+      
+      <!-- Barra Superior del Modal -->
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="category-badge" id="modal-category">Categoría</span>
+          <h2 id="modal-title" class="modal-compound-name">Nombre del Compuesto</h2>
+          <p id="modal-subtitle" class="modal-compound-sub">Subtítulo Descriptivo</p>
+        </div>
+        <button type="button" id="modal-close-btn" class="modal-close-btn" aria-label="Cerrar ficha científica">&times;</button>
+      </div>
+
+      <!-- Selector de Pestañas: Ficha Científica / Infografía SOMEP -->
+      <div class="modal-tabs" role="tablist">
+        <button type="button" role="tab" id="tab-data-btn" class="tab-btn active" aria-selected="true" aria-controls="modal-data-pane">
+          Ficha Técnica y Evidencia
+        </button>
+        <button type="button" role="tab" id="tab-infographic-btn" class="tab-btn" aria-selected="false" aria-controls="modal-infographic-pane">
+          Infografía Original SOMEP
+        </button>
+      </div>
+
+      <!-- Cuerpo del Modal -->
+      <div class="modal-body">
+        
+        <!-- Panel 1: Datos Científicos Estructurados -->
+        <div id="modal-data-pane" class="tab-pane active" role="tabpanel" aria-labelledby="tab-data-btn">
+          
+          <!-- Sección: ¿Qué es? -->
+          <div class="detail-section">
+            <div class="section-title-wrap">
+              <span class="section-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+                </svg>
+              </span>
+              <h3>¿Qué es?</h3>
+            </div>
+            <p id="modal-que-es" class="section-text"></p>
+          </div>
+
+          <!-- Sección: ¿Qué hace o qué se estudia? -->
+          <div class="detail-section">
+            <div class="section-title-wrap">
+              <span class="section-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+              </span>
+              <h3>¿Qué hace o qué se estudia?</h3>
+            </div>
+            <p id="modal-que-hace" class="section-text"></p>
+          </div>
+
+          <!-- Sección: Usos Médicos Reconocidos -->
+          <div class="detail-section" id="modal-uso-section">
+            <div class="section-title-wrap">
+              <span class="section-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/>
+                </svg>
+              </span>
+              <h3>Usos Médicos y Contexto Regulatorio</h3>
+            </div>
+            <p id="modal-uso-medico" class="section-text"></p>
+          </div>
+
+          <!-- Sección: Clave Científica y Advertencia -->
+          <div class="detail-highlight-box">
+            <div class="highlight-header">
+              <span class="highlight-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+              </span>
+              <h4>CLAVE Y ADVERTENCIA CIENTÍFICA</h4>
+            </div>
+            <p id="modal-clave" class="highlight-text"></p>
+          </div>
+
+          <!-- Sección: Fuentes y Referencias -->
+          <div class="detail-section references-section">
+            <div class="section-title-wrap">
+              <span class="section-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                </svg>
+              </span>
+              <h3>Fuentes y Referencias Documentadas</h3>
+            </div>
+            <p id="modal-fuente" class="references-text"></p>
+          </div>
+
+        </div>
+
+        <!-- Panel 2: Infografía Oficial SOMEP -->
+        <div id="modal-infographic-pane" class="tab-pane" role="tabpanel" aria-labelledby="tab-infographic-btn" hidden>
+          <div class="infographic-container">
+            <img id="modal-infographic-img" src="" alt="Infografía Oficial de la ficha técnica" class="infographic-img" loading="lazy">
+            <p class="infographic-caption">
+              Recurso gráfico oficial emitido por la <strong>Sociedad Mexicana de Péptidos (SOMEP)</strong> para difusión científica.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pie del Modal con Descargo y Botón de Cierre -->
+      <div class="modal-footer">
+        <p class="modal-disclaimer-note">
+          “Información educativa. No sustituye una valoración médica.”
+        </p>
+        <button type="button" class="btn-secondary" id="modal-bottom-close-btn">Cerrar Ficha</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Pie de Página Institucional SOMEP -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-container">
+      
+      <div class="footer-col brand-col">
+        <div class="footer-brand">
+          <img src="assets/logo-somep.jpeg" alt="Logotipo SOMEP" class="footer-logo" width="48" height="48" onerror="this.src='assets/logo-somep.svg'">
+          <div>
+            <span class="footer-brand-title">SOMEP</span>
+            <span class="footer-brand-subtitle">SOCIEDAD MEXICANA DE PÉPTIDOS</span>
+          </div>
+        </div>
+        <p class="footer-mission">
+          Iniciativa médica y científica orientada a conectar conocimiento riguroso, formación continua y acceso profesional a un portafolio documentado con criterios de calidad y transparencia.
+        </p>
+      </div>
+
+      <div class="footer-col links-col">
+        <h4 class="footer-heading">Líneas de Desarrollo</h4>
+        <ul class="footer-links">
+          <li><span>Comunidad y Membresías</span></li>
+          <li><span>Academia y Cursos con Constancia</span></li>
+          <li><span>Portafolio Científico Documentado</span></li>
+          <li><span>Criterios de Elegibilidad y Trazabilidad</span></li>
+        </ul>
+      </div>
+
+      <div class="footer-col contact-col">
+        <h4 class="footer-heading">Contacto Institucional</h4>
+        <p class="footer-contact-item">
+          <strong>Atención y Vinculación:</strong><br>
+          55 7924 7494
+        </p>
+        <p class="footer-contact-item">
+          <strong>Ámbito:</strong><br>
+          República Mexicana con proyección a Latinoamérica.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Barra Inferior de Descargo Legal y Médico -->
+    <div class="footer-bottom-bar">
+      <div class="container bottom-bar-inner">
+        <div class="mandatory-disclaimer">
+          <strong>DECLARACIÓN MÉDICA OBLIGATORIA:</strong>
+          <span>“Información educativa. No sustituye una valoración médica.”</span>
+        </div>
+        <p class="copyright-notice">
+          &copy; 2026 SOMEP — Sociedad Mexicana de Péptidos. Todos los derechos reservados. Desarrollado para fines educativos y de consulta científica.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript Vanilla Modular -->
+  <script src="js/app.js"></script>
+</body>
+</html>

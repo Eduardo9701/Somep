@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5C77A"/>
+      <stop offset="50%" stop-color="#C5A059"/>
+      <stop offset="100%" stop-color="#997732"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00855A"/>
+      <stop offset="100%" stop-color="#005A3E"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6A226C"/>
+      <stop offset="100%" stop-color="#4A154B"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Molecular S Motif -->
+  <g transform="translate(250, 150)" filter="url(#softShadow)">
+    <!-- Swirl ribbon accents -->
+    <path d="M -40 -90 C -70 -70 -90 -20 -60 20 C -40 50 -20 70 -50 100 C -70 120 -80 140 -40 150" 
+          fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 40 -90 C 70 -70 90 -20 60 20 C 40 50 20 70 50 100 C 70 120 80 140 40 150" 
+          fill="none" stroke="#006847" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+          
+    <!-- Molecular Bonds (connecting rods) -->
+    <line x1="-50" y1="-80" x2="5" y2="-72" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="5" y1="-72" x2="55" y2="-55" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="55" y1="-55" x2="90" y2="-25" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    
+    <line x1="-50" y1="-80" x2="-65" y2="-20" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="-65" y1="-20" x2="-45" y2="35" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="-45" y1="35" x2="8" y2="60" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    
+    <line x1="8" y1="60" x2="52" y2="105" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="52" y1="105" x2="80" y2="160" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    
+    <line x1="8" y1="60" x2="-45" y2="105" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="-45" y1="105" x2="-80" y2="150" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="-80" y1="150" x2="-35" y2="185" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="-35" y1="185" x2="25" y2="195" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+    <line x1="25" y1="195" x2="80" y2="160" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Spheres (Purple and Green) -->
+    <!-- Top curve -->
+    <circle cx="-50" cy="-80" r="26" fill="url(#purpleGrad)"/>
+    <circle cx="5" cy="-72" r="18" fill="url(#greenGrad)"/>
+    <circle cx="55" cy="-55" r="20" fill="url(#purpleGrad)"/>
+    <circle cx="90" cy="-25" r="14" fill="url(#greenGrad)"/>
+
+    <!-- Center crossover -->
+    <circle cx="-65" cy="-20" r="20" fill="url(#greenGrad)"/>
+    <circle cx="8" cy="60" r="28" fill="url(#purpleGrad)"/>
+
+    <!-- Bottom curve -->
+    <circle cx="52" cy="105" r="18" fill="url(#greenGrad)"/>
+    <circle cx="-80" cy="150" r="17" fill="url(#purpleGrad)"/>
+    <circle cx="-35" cy="185" r="24" fill="url(#purpleGrad)"/>
+    <circle cx="25" cy="195" r="17" fill="url(#greenGrad)"/>
+    <circle cx="80" cy="160" r="30" fill="url(#purpleGrad)"/>
+  </g>
+
+  <!-- Typographic Branding -->
+  <g transform="translate(250, 410)" text-anchor="middle">
+    <!-- SOMEP text in purple serif -->
+    <text y="0" font-family="'Cinzel', 'Playfair Display', 'Times New Roman', serif" font-size="82" font-weight="800" fill="#4A154B" letter-spacing="6">SOMEP</text>
+    
+    <!-- Gold accent underline bars -->
+    <line x1="-210" y1="14" x2="-95" y2="14" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="95" y1="14" x2="210" y2="14" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Subtitle in green uppercase -->
+    <text y="42" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="17" font-weight="700" fill="#006847" letter-spacing="5">SOCIEDAD MEXICANA DE PÉPTIDOS</text>
+  </g>
+</svg>
