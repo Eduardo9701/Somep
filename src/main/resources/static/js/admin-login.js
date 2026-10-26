@@ -14,8 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnText = document.getElementById('btn-text');
     const btnSpinner = document.getElementById('btn-spinner');
 
-    // Verificar si ya existe una sesión activa
-    verificarSesionPrevia();
+    // Manejo de parámetro ?logout=true
+    const urlParams = new URLSearchParams(window.location.search);
+    const esLogout = urlParams.get('logout') === 'true';
+
+    if (esLogout) {
+        alertBox.className = 'alert alert-success';
+        alertBox.textContent = 'Has cerrado sesión exitosamente.';
+        alertBox.style.display = 'block';
+        document.cookie = 'JSESSIONID=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    } else {
+        // Solo verificar sesión previa si NO venimos de un logout voluntario
+        verificarSesionPrevia();
+    }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();

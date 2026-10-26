@@ -101,16 +101,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function cerrarSesion() {
+        if (btnLogout) {
+            btnLogout.disabled = true;
+            btnLogout.innerHTML = '<span class="spinner" style="border-top-color: var(--primary); width: 0.9rem; height: 0.9rem;"></span> <span>Saliendo...</span>';
+        }
+
         try {
             const token = await obtenerCsrfToken();
             await fetch('/api/auth/logout', {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
+                    'Accept': 'application/json',
                     'X-XSRF-TOKEN': token || ''
                 }
             });
+        } catch (ignored) {
         } finally {
-            window.location.replace('/admin/login.html');
+            // Limpiar cookies de sesión en el navegador
+            document.cookie = 'JSESSIONID=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/admin/login.html?logout=true';
         }
     }
 

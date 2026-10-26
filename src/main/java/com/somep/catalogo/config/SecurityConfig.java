@@ -41,7 +41,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/api/auth/login") // Permite el inicio de sesión inicial sin requerir token previo
+                .ignoringRequestMatchers("/api/auth/login", "/api/auth/logout") // Permite login y logout garantizados sin bloqueo por token caducado
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
