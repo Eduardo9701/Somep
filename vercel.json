@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "outputDirectory": "src/main/resources/static",
+  "rewrites": [
+    {
+      "source": "/api/peptidos/categorias",
+      "destination": "/api/categorias"
+    },
+    {
+      "source": "/api/peptidos/:id",
+      "destination": "/api/peptidos?id=:id"
+    },
+    {
+      "source": "/api/peptidos",
+      "destination": "/api/peptidos"
+    }
+  ]
+}
