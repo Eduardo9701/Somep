@@ -7,10 +7,19 @@ import com.somep.catalogo.service.PeptidoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/peptidos")
@@ -94,6 +103,61 @@ public class AdminPeptidoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "error", "Error al eliminar compuesto",
                     "mensaje", ex.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/upload-imagen")
+    public ResponseEntity<?> subirImagen(@RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Archivo vacío",
+                    "mensaje", "Por favor seleccione un archivo de imagen válido."
+            ));
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("image/")) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Formato inválido",
+                    "mensaje", "El archivo debe ser una imagen válida (JPG, PNG, WEBP, SVG o GIF)."
+            ));
+        }
+
+        try {
+            Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+
+            String originalName = StringUtils.cleanPath(file.getOriginalFilename() != null ? file.getOriginalFilename() : "imagen.jpg");
+            String extension = "";
+            int dotIndex = originalName.lastIndexOf(".");
+            if (dotIndex > 0) {
+                extension = originalName.substring(dotIndex).toLowerCase();
+            } else {
+                extension = ".jpg";
+            }
+
+            String uniqueFilename = UUID.randomUUID().toString().substring(0, 8) + "_" + System.currentTimeMillis() + extension;
+            Path destinationFile = uploadDir.resolve(uniqueFilename).normalize();
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            String publicUrl = "/uploads/" + uniqueFilename;
+
+            return ResponseEntity.ok(Map.of(
+                    "url", publicUrl,
+                    "nombre", originalName,
+                    "mensaje", "Imagen cargada correctamente."
+            ));
+
+        } catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "error", "Error de almacenamiento",
+                    "mensaje", "No fue posible guardar la imagen en el servidor: " + ex.getMessage()
             ));
         }
     }

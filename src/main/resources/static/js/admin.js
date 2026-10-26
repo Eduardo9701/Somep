@@ -1,9 +1,13 @@
 /**
  * SOMEP - Módulo de Gestión Administrativa y Operaciones CRUD
  * Vanilla JavaScript ES6+
+ * Sincronización en tiempo real sin recargar página & Carga de imágenes locales
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Canal de sincronización en tiempo real entre pestañas y catálogo público
+    const somepSyncChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('somep_catalog_channel') : null;
+
     // Estado en memoria
     let todosLosPeptidos = [];
     let peptidoSeleccionadoParaEliminar = null;
@@ -29,6 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const formModalTitle = document.getElementById('form-modal-title');
     const peptidoForm = document.getElementById('peptido-form');
     const formPeptidoId = document.getElementById('form-peptido-id');
+    const formImagen = document.getElementById('form-imagen');
+    const formImagenFile = document.getElementById('form-imagen-file');
+    const btnTriggerUpload = document.getElementById('btn-trigger-upload');
+    const uploadStatus = document.getElementById('upload-status');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const imagePreviewImg = document.getElementById('image-preview-img');
+    const imagePreviewName = document.getElementById('image-preview-name');
+    const btnRemovePreview = document.getElementById('btn-remove-preview');
+
     const btnSavePeptido = document.getElementById('btn-save-peptido');
     const saveBtnText = document.getElementById('save-btn-text');
     const saveBtnSpinner = document.getElementById('save-btn-spinner');
@@ -102,14 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function obtenerCsrfToken() {
-        // Primero intentar leer la cookie generada por CookieCsrfTokenRepository
         const cookieToken = getCookie('XSRF-TOKEN');
         if (cookieToken) {
             csrfTokenCached = cookieToken;
             return cookieToken;
         }
 
-        // Si no está en la cookie aún, pedirla al endpoint
         try {
             const res = await fetch('/api/auth/csrf');
             if (res.ok) {
@@ -127,6 +138,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function getCookie(name) {
         const match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
         return match ? decodeURIComponent(match[3]) : null;
+    }
+
+    // Notificación en tiempo real sin recargar página
+    function notificarSincronizacion(accion, id) {
+        const payload = { action: 'catalog_updated', eventType: accion, id, timestamp: Date.now() };
+        if (somepSyncChannel) {
+            somepSyncChannel.postMessage(payload);
+        }
+        try {
+            localStorage.setItem('somep_catalog_last_sync', JSON.stringify(payload));
+        } catch (ignored) {}
     }
 
     // 3. Cargar Estadísticas
@@ -154,18 +176,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 4. Cargar y Renderizar Catálogo
+    // 4. Cargar y Renderizar Catálogo en vivo
     async function cargarPeptidos() {
         try {
-            tableBody.innerHTML = `
-                <tr>
-                  <td colspan="6" class="empty-state">
-                    <div class="spinner" style="border-top-color: var(--primary); width: 2rem; height: 2rem;"></div>
-                    <p style="margin-top: 1rem;">Cargando registros...</p>
-                  </td>
-                </tr>
-            `;
-
             const res = await fetch('/api/admin/peptidos');
             if (!res.ok) throw new Error('Error al consultar el catálogo');
 
@@ -177,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr>
                   <td colspan="6" class="empty-state">
                     <div class="empty-state-icon">⚠️</div>
-                    <p>No fue posible cargar el catálogo. Por favor recarga la página.</p>
+                    <p>No fue posible cargar el catálogo. Por favor verifique la conexión.</p>
                   </td>
                 </tr>
             `;
@@ -220,7 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
                 <tr data-id="${p.id}">
                   <td style="font-weight: 600; color: var(--text-muted);">#${p.id}</td>
-                  <td><strong>${escapeHtml(p.nombre)}</strong></td>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                      ${p.imagenUrl ? `<img src="${p.imagenUrl}" alt="" style="width: 28px; height: 28px; border-radius: 4px; object-fit: cover;" onerror="this.style.display='none'">` : ''}
+                      <strong>${escapeHtml(p.nombre)}</strong>
+                    </div>
+                  </td>
                   <td><span class="badge-cat">${escapeHtml(p.categoria)}</span></td>
                   <td style="color: var(--text-muted); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     ${escapeHtml(p.subtitulo)}
@@ -263,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarTabla(filtrados);
     }
 
-    // 6. Formulario Crear / Editar
+    // 6. Formulario Crear / Editar con subida de imagen local
     function abrirModalCrear() {
         limpiarFormulario();
         formModalTitle.textContent = 'Agregar nuevo compuesto';
@@ -290,11 +308,75 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('form-uso-medico').value = peptido.usoMedico || '';
         document.getElementById('form-clave').value = peptido.clave || '';
         document.getElementById('form-fuente').value = peptido.fuente || '';
-        document.getElementById('form-imagen').value = peptido.imagenUrl || '';
+        formImagen.value = peptido.imagenUrl || '';
+
+        if (peptido.imagenUrl) {
+            mostrarPreviewImagen(peptido.imagenUrl, peptido.nombre);
+        }
 
         modalFormOverlay.classList.add('active');
         document.getElementById('form-nombre').focus();
     };
+
+    function mostrarPreviewImagen(url, nombre) {
+        imagePreviewImg.src = url;
+        imagePreviewName.textContent = nombre || 'Imagen seleccionada';
+        imagePreviewContainer.style.display = 'flex';
+    }
+
+    function ocultarPreviewImagen() {
+        imagePreviewImg.src = '';
+        imagePreviewContainer.style.display = 'none';
+        if (formImagenFile) formImagenFile.value = '';
+    }
+
+    // Subida de imagen desde el dispositivo
+    async function subirImagenDesdeDispositivo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            mostrarToast('Por favor selecciona un archivo de imagen válido (JPG, PNG, WEBP, SVG o GIF).', 'danger');
+            formImagenFile.value = '';
+            return;
+        }
+
+        if (file.size > 15 * 1024 * 1024) {
+            mostrarToast('La imagen supera el límite permitido de 15 MB.', 'danger');
+            formImagenFile.value = '';
+            return;
+        }
+
+        uploadStatus.style.display = 'inline-flex';
+
+        try {
+            const token = await obtenerCsrfToken();
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/admin/peptidos/upload-imagen', {
+                method: 'POST',
+                headers: {
+                    'X-XSRF-TOKEN': token || ''
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.url) {
+                formImagen.value = data.url;
+                mostrarPreviewImagen(data.url, file.name);
+                mostrarToast('Imagen subida exitosamente desde tu dispositivo.', 'success');
+            } else {
+                mostrarToast(data.mensaje || 'Error al subir la imagen al servidor.', 'danger');
+            }
+        } catch (error) {
+            mostrarToast('Error de red al intentar subir la imagen.', 'danger');
+        } finally {
+            uploadStatus.style.display = 'none';
+        }
+    }
 
     async function guardarPeptido() {
         limpiarErroresFormulario();
@@ -308,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const usoMedico = document.getElementById('form-uso-medico').value.trim();
         const clave = document.getElementById('form-clave').value.trim();
         const fuente = document.getElementById('form-fuente').value.trim();
-        const imagenUrl = document.getElementById('form-imagen').value.trim();
+        const imagenUrl = formImagen.value.trim();
 
         let valido = true;
 
@@ -356,7 +438,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 cerrarModalFormulario();
                 mostrarToast(esEdicion ? 'Compuesto actualizado correctamente.' : 'Compuesto registrado exitosamente.', 'success');
+                
+                // Actualización inmediata en el DOM sin recargar la página
                 await Promise.all([cargarEstadisticas(), cargarPeptidos()]);
+                
+                // Notificar a otras pestañas y al catálogo público en vivo
+                notificarSincronizacion(esEdicion ? 'UPDATE' : 'CREATE', data.id || id);
             } else {
                 mostrarToast(data.mensaje || 'Error al guardar los datos.', 'danger');
             }
@@ -385,6 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function limpiarFormulario() {
         peptidoForm.reset();
         formPeptidoId.value = '';
+        ocultarPreviewImagen();
         limpiarErroresFormulario();
     }
 
@@ -475,7 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const token = await obtenerCsrfToken();
-            const res = await fetch(`/api/admin/peptidos/${peptidoSeleccionadoParaEliminar}`, {
+            const idAEliminar = peptidoSeleccionadoParaEliminar;
+            const res = await fetch(`/api/admin/peptidos/${idAEliminar}`, {
                 method: 'DELETE',
                 headers: {
                     'X-XSRF-TOKEN': token || ''
@@ -485,7 +574,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 cerrarModalDelete();
                 mostrarToast('Compuesto eliminado correctamente de la base de datos.', 'success');
+                
+                // Actualización inmediata sin recargar la página
                 await Promise.all([cargarEstadisticas(), cargarPeptidos()]);
+                
+                // Notificar sincronización en vivo
+                notificarSincronizacion('DELETE', idAEliminar);
             } else {
                 const data = await res.json();
                 mostrarToast(data.mensaje || 'Error al eliminar el registro.', 'danger');
@@ -533,6 +627,24 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCloseFormModal.addEventListener('click', cerrarModalFormulario);
         btnCancelForm.addEventListener('click', cerrarModalFormulario);
         btnSavePeptido.addEventListener('click', guardarPeptido);
+
+        // Subida de imagen
+        btnTriggerUpload.addEventListener('click', () => formImagenFile.click());
+        formImagenFile.addEventListener('change', subirImagenDesdeDispositivo);
+        btnRemovePreview.addEventListener('click', () => {
+            formImagen.value = '';
+            ocultarPreviewImagen();
+        });
+
+        // Entrada manual en formImagen
+        formImagen.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) {
+                mostrarPreviewImagen(val, 'Imagen manual');
+            } else {
+                ocultarPreviewImagen();
+            }
+        });
 
         btnCloseViewModal.addEventListener('click', cerrarModalView);
         btnCloseView.addEventListener('click', cerrarModalView);

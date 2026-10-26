@@ -75,6 +75,9 @@
     modalInfographicPane: document.getElementById('modal-infographic-pane')
   };
 
+  // Canal de sincronización en tiempo real con el panel administrativo
+  const somepSyncChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('somep_catalog_channel') : null;
+
   /**
    * Inicialización al cargar el documento
    */
@@ -82,8 +85,42 @@
     setupEventListeners();
     setupAcademyFilters();
     setupNavigationHighlight();
+    setupRealtimeSync();
     fetchInitialData();
   });
+
+  /**
+   * Sincronización automática en tiempo real sin recargar página
+   */
+  function setupRealtimeSync() {
+    // 1. Mensaje directo desde el panel administrativo en la misma sesión/navegador
+    if (somepSyncChannel) {
+      somepSyncChannel.onmessage = (event) => {
+        if (event.data && event.data.action === 'catalog_updated') {
+          fetchInitialData();
+        }
+      };
+    }
+
+    // 2. Evento de Storage para pestañas cruzadas
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'somep_catalog_last_sync') {
+        fetchInitialData();
+      }
+    });
+
+    // 3. Al cambiar de pestaña y regresar al catálogo
+    window.addEventListener('focus', () => {
+      fetchInitialData();
+    });
+
+    // 4. Polling suave cada 20 segundos para usuarios remotos en otros dispositivos
+    setInterval(() => {
+      if (!document.hidden && (!state.searchQuery || state.searchQuery === '')) {
+        fetchInitialData(true); // carga silenciosa sin parpadeo
+      }
+    }, 20000);
+  }
 
   /**
    * Configuración de eventos de la interfaz
@@ -206,10 +243,12 @@
   }
 
   /**
-   * Carga inicial simultánea de catálogo y categorías
+   * Carga inicial simultánea de catálogo y categorías (soporta actualización silenciosa en vivo)
    */
-  async function fetchInitialData() {
-    showLoading();
+  async function fetchInitialData(silent = false) {
+    if (!silent) {
+      showLoading();
+    }
     try {
       const [peptidosRes, categoriasRes] = await Promise.all([
         fetch(API_BASE),

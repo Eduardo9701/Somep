@@ -50,7 +50,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Recursos estáticos públicos
                 .requestMatchers("/", "/index.html", "/cursos.html", "/catalogo.html").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/assets/**", "/favicon.ico").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/assets/**", "/uploads/**", "/favicon.ico").permitAll()
                 // Catálogo público
                 .requestMatchers(HttpMethod.GET, "/api/peptidos/**").permitAll()
                 // Autenticación pública y login

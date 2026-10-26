@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
@@ -110,5 +111,21 @@ class AdminPeptidoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(15)))
                 .andExpect(jsonPath("$.mensaje", containsString("exitosamente")));
+    }
+
+    @Test
+    @DisplayName("POST /api/admin/peptidos/upload-imagen debe subir imagen y retornar 200 OK con la URL")
+    void testSubirImagen() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test-peptido.png",
+                "image/png",
+                "contenido simulado de imagen".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/admin/peptidos/upload-imagen").file(file))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.url", startsWith("/uploads/")))
+                .andExpect(jsonPath("$.nombre", is("test-peptido.png")));
     }
 }

@@ -26,6 +26,10 @@ buildNumber.properties
 *.local
 *.log
 
+# Dynamic Uploads
+uploads/*
+!uploads/.gitkeep
+
 # OS Generated
 Thumbs.db
 Desktop.ini
