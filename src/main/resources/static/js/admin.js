@@ -319,14 +319,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function mostrarPreviewImagen(url, nombre) {
+        if (!imagePreviewContainer || !imagePreviewImg) return;
         imagePreviewImg.src = url;
-        imagePreviewName.textContent = nombre || 'Imagen seleccionada';
+        if (imagePreviewName) imagePreviewName.textContent = nombre || 'Imagen seleccionada';
         imagePreviewContainer.style.display = 'flex';
     }
 
     function ocultarPreviewImagen() {
-        imagePreviewImg.src = '';
-        imagePreviewContainer.style.display = 'none';
+        if (imagePreviewImg) imagePreviewImg.src = '';
+        if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
         if (formImagenFile) formImagenFile.value = '';
     }
 
@@ -616,42 +617,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // 10. Listeners y Eventos
+    // 10. Listeners y Eventos con protección de existencia de elementos (Defensive DOM)
     function inicializarEventos() {
-        btnLogout.addEventListener('click', cerrarSesion);
+        if (btnLogout) btnLogout.addEventListener('click', cerrarSesion);
 
-        searchInput.addEventListener('input', aplicarFiltros);
-        categoryFilter.addEventListener('change', aplicarFiltros);
+        if (searchInput) searchInput.addEventListener('input', aplicarFiltros);
+        if (categoryFilter) categoryFilter.addEventListener('change', aplicarFiltros);
 
-        btnOpenCreateModal.addEventListener('click', abrirModalCrear);
-        btnCloseFormModal.addEventListener('click', cerrarModalFormulario);
-        btnCancelForm.addEventListener('click', cerrarModalFormulario);
-        btnSavePeptido.addEventListener('click', guardarPeptido);
+        if (btnOpenCreateModal) btnOpenCreateModal.addEventListener('click', abrirModalCrear);
+        if (btnCloseFormModal) btnCloseFormModal.addEventListener('click', cerrarModalFormulario);
+        if (btnCancelForm) btnCancelForm.addEventListener('click', cerrarModalFormulario);
+        if (btnSavePeptido) btnSavePeptido.addEventListener('click', guardarPeptido);
 
-        // Subida de imagen
-        btnTriggerUpload.addEventListener('click', () => formImagenFile.click());
-        formImagenFile.addEventListener('change', subirImagenDesdeDispositivo);
-        btnRemovePreview.addEventListener('click', () => {
-            formImagen.value = '';
-            ocultarPreviewImagen();
-        });
+        // Subida de imagen desde el dispositivo
+        if (btnTriggerUpload && formImagenFile) {
+            btnTriggerUpload.addEventListener('click', () => formImagenFile.click());
+        }
+        if (formImagenFile) {
+            formImagenFile.addEventListener('change', subirImagenDesdeDispositivo);
+        }
+        if (btnRemovePreview) {
+            btnRemovePreview.addEventListener('click', () => {
+                if (formImagen) formImagen.value = '';
+                ocultarPreviewImagen();
+            });
+        }
 
         // Entrada manual en formImagen
-        formImagen.addEventListener('input', (e) => {
-            const val = e.target.value.trim();
-            if (val) {
-                mostrarPreviewImagen(val, 'Imagen manual');
-            } else {
-                ocultarPreviewImagen();
-            }
-        });
+        if (formImagen) {
+            formImagen.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                if (val) {
+                    mostrarPreviewImagen(val, 'Imagen manual');
+                } else {
+                    ocultarPreviewImagen();
+                }
+            });
+        }
 
-        btnCloseViewModal.addEventListener('click', cerrarModalView);
-        btnCloseView.addEventListener('click', cerrarModalView);
+        if (btnCloseViewModal) btnCloseViewModal.addEventListener('click', cerrarModalView);
+        if (btnCloseView) btnCloseView.addEventListener('click', cerrarModalView);
 
-        btnCloseDeleteModal.addEventListener('click', cerrarModalDelete);
-        btnCancelDelete.addEventListener('click', cerrarModalDelete);
-        btnConfirmDelete.addEventListener('click', confirmarEliminar);
+        if (btnCloseDeleteModal) btnCloseDeleteModal.addEventListener('click', cerrarModalDelete);
+        if (btnCancelDelete) btnCancelDelete.addEventListener('click', cerrarModalDelete);
+        if (btnConfirmDelete) btnConfirmDelete.addEventListener('click', confirmarEliminar);
 
         // Cerrar modales con tecla Escape
         document.addEventListener('keydown', (e) => {
