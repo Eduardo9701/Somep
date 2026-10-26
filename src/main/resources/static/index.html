@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOMEP — Catálogo Científico e Interactivo de Péptidos y Moléculas</title>
   
-  <meta name="description" content="Glosario médico-educativo y catálogo científico oficial de la Sociedad Mexicana de Péptidos (SOMEP). Consulta objetiva y referenciada de péptidos, moléculas y nutrientes.">
+  <meta name="description" content="Glosario médico-educativo y catálogo científico oficial de la Sociedad Mexicana de Péptidos (SOMEP). Consulta objetiva, academia y cursos con constancia.">
   <meta name="theme-color" content="#4A154B">
 
   <!-- Favicon e Iconografía -->
@@ -40,7 +40,7 @@
   <!-- Cabecera Institucional SOMEP -->
   <header class="site-header" role="banner">
     <div class="container header-container">
-      <a href="./" class="brand-link" aria-label="SOMEP - Inicio del Catálogo">
+      <a href="#catalogo" class="brand-link" aria-label="SOMEP - Inicio del Catálogo">
         <img src="assets/logo-somep.jpeg" alt="Logotipo Oficial SOMEP" class="brand-logo" width="60" height="60" onerror="this.src='assets/logo-somep.svg'">
         <div class="brand-titles">
           <h1 class="brand-acronym">SOMEP</h1>
@@ -49,13 +49,22 @@
         </div>
       </a>
 
+      <!-- Navegación Principal -->
+      <nav class="main-nav" aria-label="Navegación principal del sitio">
+        <ul class="nav-menu">
+          <li><a href="#catalogo" class="nav-link active">Catálogo Científico</a></li>
+          <li><a href="#academia" class="nav-link">Academia & Cursos</a></li>
+          <li><a href="#contacto" class="nav-link">Contacto</a></li>
+        </ul>
+      </nav>
+
       <div class="header-contact">
-        <div class="contact-pill">
+        <a href="https://wa.me/525579247494?text=Hola%2C%20deseo%20solicitar%20informaci%C3%B3n%20sobre%20SOMEP%20y%20la%20oferta%20acad%C3%A9mica" target="_blank" rel="noopener noreferrer" class="contact-pill" title="Contactar por WhatsApp">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
             <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
           </svg>
           <span>Vinculación: <strong>55 7924 7494</strong></span>
-        </div>
+        </a>
       </div>
     </div>
   </header>
@@ -169,6 +178,182 @@
     </section>
 
   </main>
+
+  <!-- ======================================================================
+       SECCIÓN: ACADEMIA, CURSOS CON CONSTANCIA, CONFERENCIAS Y SEMINARIOS
+       ====================================================================== -->
+  <section class="academy-section" id="academia" aria-labelledby="academy-title">
+    <div class="container">
+      
+      <div class="section-badge-center">
+        <span class="academy-pill">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+          </svg>
+          FORMACIÓN MÉDICA CONTINUA & VINCULACIÓN PROFESIONAL
+        </span>
+      </div>
+
+      <div class="academy-header-block">
+        <h2 id="academy-title" class="academy-main-title">
+          Academia SOMEP — Cursos, Conferencias y Seminarios
+        </h2>
+        <p class="academy-lead">
+          Una propuesta integral de actualización científica diseñada para médicos y profesionales de la salud. Acceda a programas formativos con lecciones estructuradas, evaluación rigurosa y <strong>emisión de constancias institucionales con folio oficial y alcance claramente especificado</strong>.
+        </p>
+      </div>
+
+      <!-- Filtro de Tipos de Formación -->
+      <div class="academy-filters-bar" role="tablist" aria-label="Filtrar programas académicos">
+        <button type="button" class="academy-filter-btn active" data-filter="all">Todos los Programas</button>
+        <button type="button" class="academy-filter-btn" data-filter="curso">Cursos & Diplomados</button>
+        <button type="button" class="academy-filter-btn" data-filter="seminario">Seminarios Clínicos</button>
+        <button type="button" class="academy-filter-btn" data-filter="conferencia">Conferencias & Simposios</button>
+      </div>
+
+      <!-- Cuadrícula de Programas Académicos -->
+      <div class="academy-grid" id="academy-grid">
+        
+        <!-- Programa 1: Diplomado Internacional -->
+        <article class="academy-card" data-category="curso">
+          <div class="academy-card-media">
+            <img src="assets/images/curso-peptidos.jpg" alt="Médico en laboratorio evaluando datos de péptidos" class="academy-card-img" loading="lazy">
+            <div class="academy-card-overlay">
+              <span class="badge-type badge-course">Curso con Constancia</span>
+              <span class="badge-status">Inscripciones Abiertas</span>
+            </div>
+          </div>
+          <div class="academy-card-content">
+            <div class="academy-meta-row">
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                60 Horas Académicas
+              </span>
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+                Modalidad Online Asíncrona + Tutoría
+              </span>
+            </div>
+            <h3 class="academy-card-title">
+              Diplomado Internacional en Terapéutica Peptídica y Bioquímica Celular
+            </h3>
+            <p class="academy-card-desc">
+              Formación exhaustiva sobre la bioquímica y farmacocinética de péptidos bioactivos, receptores hormonales acoplados a proteínas G, cascadas de señalización y análisis crítico de la literatura preclínica y clínica internacional.
+            </p>
+            <div class="academy-highlight-box">
+              <div class="highlight-mini-header">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <span>Acreditación SOMEP</span>
+              </div>
+              <p class="highlight-mini-text">Constancia con folio de registro institucional único, desglose curricular de horas crédito y verificación digital QR.</p>
+            </div>
+            <div class="academy-card-actions">
+              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20sobre%20el%20Diplomado%20Internacional%20en%20Terap%C3%A9utica%20Pept%C3%ADdica" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
+                <span>Solicitar Programa e Inscripción</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Programa 2: Seminario Clínico -->
+        <article class="academy-card" data-category="seminario">
+          <div class="academy-card-media">
+            <img src="assets/images/seminario-metabolico.jpg" alt="Especialistas médicos en discusión de casos clínicos" class="academy-card-img" loading="lazy">
+            <div class="academy-card-overlay">
+              <span class="badge-type badge-seminar">Seminario Clínico</span>
+              <span class="badge-status">Próxima Edición</span>
+            </div>
+          </div>
+          <div class="academy-card-content">
+            <div class="academy-meta-row">
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                16 Horas Teórico-Prácticas
+              </span>
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/></svg>
+                Sesiones en Vivo con Expertos
+              </span>
+            </div>
+            <h3 class="academy-card-title">
+              Seminario Avanzado: Agonistas GLP-1 / GIP / Glucagón y Nuevas Moléculas Metabólicas
+            </h3>
+            <p class="academy-card-desc">
+              Actualización profunda sobre tirzepatida, retatrutide e incretinas sintéticas. Revisión de mecanismos fisiopatológicos, perfiles de seguridad, manejo de reacciones adversas y marco regulatorio vigente ante COFEPRIS y FDA.
+            </p>
+            <div class="academy-highlight-box">
+              <div class="highlight-mini-header">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <span>Acreditación SOMEP</span>
+              </div>
+              <p class="highlight-mini-text">Constancia institucional de actualización médica continua con evaluación de casos y constancia foliada.</p>
+            </div>
+            <div class="academy-card-actions">
+              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20sobre%20el%20Seminario%20de%20Agonistas%20GLP-1%20y%20GIP" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
+                <span>Solicitar Programa e Inscripción</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Programa 3: Conferencia & Simposio -->
+        <article class="academy-card" data-category="conferencia">
+          <div class="academy-card-media">
+            <img src="assets/images/conferencia-anual.jpg" alt="Auditorio de conferencias médicas magistrales" class="academy-card-img" loading="lazy">
+            <div class="academy-card-overlay">
+              <span class="badge-type badge-conference">Simposio Nacional</span>
+              <span class="badge-status">Convocatoria 2026</span>
+            </div>
+          </div>
+          <div class="academy-card-content">
+            <div class="academy-meta-row">
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                Híbrido: CDMX & Streaming
+              </span>
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                Mesas de Diálogo y Vinculación
+              </span>
+            </div>
+            <h3 class="academy-card-title">
+              I Simposio Nacional SOMEP: Fronteras Científicas en Péptidos y Medicina de Precisión
+            </h3>
+            <p class="academy-card-desc">
+              El evento magno de vinculación científica. Conferencias magistrales con investigadores y docentes sobre neuroprotección (Semax, Cerebrolysin), equilibrio redox (Glutatión, NAD) y el futuro del portafolio documentado en México.
+            </p>
+            <div class="academy-highlight-box">
+              <div class="highlight-mini-header">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <span>Acreditación SOMEP</span>
+              </div>
+              <p class="highlight-mini-text">Constancia oficial de asistencia institucional con código QR y valor curricular para miembros de la sociedad.</p>
+            </div>
+            <div class="academy-card-actions">
+              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20para%20asistir%20al%20I%20Simposio%20Nacional%20SOMEP" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
+                <span>Reservar Lugar / Información</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Nota Institucional Normativa (Slide 6 SOMEP) -->
+      <div class="academy-disclaimer-box">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="#4A154B" class="disclaimer-note-icon" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        <p class="academy-disclaimer-text">
+          <strong>Lineamientos Institucionales de la Academia SOMEP:</strong> Los programas académicos, docentes y beneficios se informan formalmente conforme se confirman sus fechas de apertura. Las constancias emitidas certifican la participación y acreditación del curso con folio y alcance estrictamente indicados; no equivalen a títulos ni cédulas profesionales de grado.
+        </p>
+      </div>
+
+    </div>
+  </section>
 
   <!-- Modal Accesible para Vista de Detalle y Ficha Ampliada -->
   <div id="detail-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
@@ -291,7 +476,7 @@
   </div>
 
   <!-- Pie de Página Institucional SOMEP -->
-  <footer class="site-footer" role="contentinfo">
+  <footer class="site-footer" id="contacto" role="contentinfo">
     <div class="container footer-container">
       
       <div class="footer-col brand-col">
@@ -310,10 +495,10 @@
       <div class="footer-col links-col">
         <h4 class="footer-heading">Líneas de Desarrollo</h4>
         <ul class="footer-links">
-          <li><span>Comunidad y Membresías</span></li>
-          <li><span>Academia y Cursos con Constancia</span></li>
-          <li><span>Portafolio Científico Documentado</span></li>
-          <li><span>Criterios de Elegibilidad y Trazabilidad</span></li>
+          <li><a href="#contacto" class="footer-nav-link">Comunidad y Membresías</a></li>
+          <li><a href="#academia" class="footer-nav-link footer-highlight-link">Academia y Cursos con Constancia</a></li>
+          <li><a href="#catalogo" class="footer-nav-link">Portafolio Científico Documentado</a></li>
+          <li><a href="#catalogo" class="footer-nav-link">Criterios de Elegibilidad y Trazabilidad</a></li>
         </ul>
       </div>
 
@@ -321,11 +506,11 @@
         <h4 class="footer-heading">Contacto Institucional</h4>
         <p class="footer-contact-item">
           <strong>Atención y Vinculación:</strong><br>
-          55 7924 7494
+          <a href="https://wa.me/525579247494" class="footer-phone-link" target="_blank" rel="noopener noreferrer">55 7924 7494</a>
         </p>
         <p class="footer-contact-item">
-          <strong>Ámbito:</strong><br>
-          República Mexicana con proyección a Latinoamérica.
+          <strong>Sede y Alcance:</strong><br>
+          República Mexicana con proyección académica para Latinoamérica.
         </p>
       </div>
 

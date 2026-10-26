@@ -72,6 +72,8 @@
    */
   document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    setupAcademyFilters();
+    setupNavigationHighlight();
     fetchInitialData();
   });
 
@@ -132,6 +134,63 @@
       if (e.key === 'Escape' && !DOM.modal.hidden) {
         closeModal();
       }
+    });
+  }
+
+  /**
+   * Filtros de la Sección Academia (Cursos, Seminarios, Conferencias)
+   */
+  function setupAcademyFilters() {
+    const filterButtons = document.querySelectorAll('.academy-filter-btn');
+    const academyCards = document.querySelectorAll('.academy-card');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filterValue = btn.getAttribute('data-filter');
+
+        academyCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          if (filterValue === 'all' || cardCategory === filterValue) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * Resaltado de enlaces de navegación según el desplazamiento
+   */
+  function setupNavigationHighlight() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = ['catalogo', 'academia', 'contacto'];
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const scrollY = window.pageYOffset;
+
+      sections.forEach(id => {
+        const section = document.getElementById(id);
+        if (section) {
+          const sectionTop = section.offsetTop - 120;
+          const sectionHeight = section.offsetHeight;
+          if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+            current = id;
+          }
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
     });
   }
 
@@ -279,7 +338,6 @@
     // Definición rápida: ¿Qué es?
     const queEs = document.createElement('p');
     queEs.className = 'card-que-es';
-    // Truncado prudente para visualización homogénea
     const maxLen = 145;
     queEs.textContent = peptido.queEs.length > maxLen 
       ? peptido.queEs.substring(0, maxLen).trim() + '…' 
