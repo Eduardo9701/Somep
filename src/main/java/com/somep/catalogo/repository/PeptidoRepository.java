@@ -38,4 +38,7 @@ public interface PeptidoRepository extends JpaRepository<Peptido, Long> {
 
     @Query("SELECT DISTINCT p.categoria FROM Peptido p ORDER BY p.categoria ASC")
     List<String> findDistinctCategorias();
+
+    @Query("SELECT MAX(p.fechaActualizacion) FROM Peptido p")
+    Optional<java.time.LocalDateTime> findMaxFechaActualizacion();
 }

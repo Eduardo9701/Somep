@@ -27,6 +27,21 @@ CREATE TABLE IF NOT EXISTS peptidos (
     INDEX idx_peptido_categoria (categoria)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Creación de la tabla 'usuarios' para autenticación administrativa
+CREATE TABLE IF NOT EXISTS usuarios (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    email VARCHAR(120) NOT NULL UNIQUE,
+    nombre_completo VARCHAR(150) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'ROLE_ADMIN',
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ultimo_acceso DATETIME NULL,
+    INDEX idx_usuario_username (username),
+    INDEX idx_usuario_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Precarga Inicial Idempotente (9 Registros Principales + 2 Registros Institucionales SOMEP)
 INSERT INTO peptidos (nombre, subtitulo, categoria, que_es, que_hace_o_estudia, uso_medico, clave, fuente, imagen_url, fecha_creacion, fecha_actualizacion)
 SELECT * FROM (

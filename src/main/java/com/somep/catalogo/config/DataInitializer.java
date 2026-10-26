@@ -1,10 +1,13 @@
 package com.somep.catalogo.config;
 
 import com.somep.catalogo.model.Peptido;
+import com.somep.catalogo.model.Usuario;
 import com.somep.catalogo.repository.PeptidoRepository;
+import com.somep.catalogo.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -12,7 +15,7 @@ import java.util.List;
 
 /**
  * Inicializador seguro y reproducible para la carga inicial de los registros
- * científicos en la base de datos MySQL (somep_catalogo).
+ * científicos y el usuario administrador inicial en MySQL.
  * Garantiza idempotencia: si los registros ya existen, no los duplica.
  */
 @Component
@@ -20,13 +23,45 @@ public class DataInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
     private final PeptidoRepository peptidoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataInitializer(PeptidoRepository peptidoRepository) {
+    public DataInitializer(PeptidoRepository peptidoRepository,
+                           UsuarioRepository usuarioRepository,
+                           PasswordEncoder passwordEncoder) {
         this.peptidoRepository = peptidoRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
+        inicializarUsuarioAdmin();
+        inicializarCatalogoPeptidos();
+    }
+
+    private void inicializarUsuarioAdmin() {
+        if (usuarioRepository.count() == 0) {
+            String adminUser = System.getenv().getOrDefault("ADMIN_USERNAME", "admin");
+            String adminPass = System.getenv().getOrDefault("ADMIN_PASSWORD", "SomepAdmin2026!");
+            String adminEmail = System.getenv().getOrDefault("ADMIN_EMAIL", "admin@somep.org.mx");
+
+            Usuario admin = new Usuario(
+                    adminUser,
+                    passwordEncoder.encode(adminPass),
+                    adminEmail,
+                    "Administrador General SOMEP",
+                    "ROLE_ADMIN"
+            );
+            admin.setActivo(true);
+            usuarioRepository.save(admin);
+            log.info("Usuario administrador inicial ({}) creado exitosamente con credenciales protegidas.", adminUser);
+        } else {
+            log.info("Usuarios administradores existentes verificados: {} registrados.", usuarioRepository.count());
+        }
+    }
+
+    private void inicializarCatalogoPeptidos() {
         log.info("Verificando catálogo inicial de compuestos en la base de datos...");
 
         List<Peptido> registrosIniciales = Arrays.asList(
@@ -147,7 +182,7 @@ public class DataInitializer implements CommandLineRunner {
                 "/assets/images/cerebrolysin.jpeg"
             ),
 
-            // Registro complementario 10: 5-amino-1MQ (presente en portafolio SOMEP)
+            // Registro complementario 10: 5-amino-1MQ
             new Peptido(
                 "5-amino-1MQ",
                 "Molécula pequeña en investigación",

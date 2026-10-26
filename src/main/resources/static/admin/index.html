@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrativo — SOMEP</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo-somep.svg">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+  <!-- Barra de Navegación Administrativa -->
+  <header class="admin-navbar" role="banner">
+    <div class="nav-container">
+      <div class="brand-wrapper">
+        <img src="/assets/logo-somep.svg" alt="SOMEP Logo" class="brand-logo" onerror="this.onerror=null; this.src='/assets/logo-somep.jpeg';">
+        <div class="brand-text">
+          <h1>SOMEP</h1>
+          <span>Panel Administrativo</span>
+        </div>
+      </div>
+
+      <div class="user-nav-actions">
+        <a href="/index.html" class="btn btn-secondary" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+          </svg>
+          <span>Catálogo Público</span>
+        </a>
+
+        <div class="user-badge">
+          <div class="user-avatar" id="user-avatar" aria-hidden="true">A</div>
+          <div class="user-info">
+            <span class="user-name" id="user-display-name">Administrador</span>
+            <span class="user-role" id="user-display-role">ROLE_ADMIN</span>
+          </div>
+        </div>
+
+        <button id="btn-logout" class="btn btn-secondary" title="Cerrar sesión de forma segura">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+          </svg>
+          <span>Salir</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="admin-main" role="main">
+
+    <!-- Tarjetas de Métricas Estadísticas -->
+    <section class="stats-grid" aria-label="Métricas del catálogo">
+      <div class="stat-card">
+        <div class="stat-icon icon-purple">
+          🧪
+        </div>
+        <div class="stat-details">
+          <h3>Total de Compuestos</h3>
+          <div class="stat-value" id="stat-total-compuestos">—</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-green">
+          📑
+        </div>
+        <div class="stat-details">
+          <h3>Categorías Activas</h3>
+          <div class="stat-value" id="stat-total-categorias">—</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-gold">
+          🕒
+        </div>
+        <div class="stat-details">
+          <h3>Última Actualización</h3>
+          <div class="stat-value" id="stat-ultima-act" style="font-size: 1.15rem; margin-top: 0.5rem;">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel de Tabla y Operaciones -->
+    <section class="table-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Gestión de Péptidos y Moléculas</h2>
+
+        <div class="panel-controls">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input 
+              type="text" 
+              id="admin-search-input" 
+              class="search-input" 
+              placeholder="Buscar por nombre o subtítulo...">
+          </div>
+
+          <select id="admin-category-filter" class="category-filter" aria-label="Filtrar por categoría">
+            <option value="">Todas las categorías</option>
+          </select>
+
+          <button id="btn-open-create-modal" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            <span>Agregar nuevo compuesto</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table" id="admin-peptidos-table">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Subtítulo</th>
+              <th scope="col">Última Modificación</th>
+              <th scope="col" style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="spinner" style="border-top-color: var(--primary); width: 2rem; height: 2rem;"></div>
+                <p style="margin-top: 1rem;">Cargando catálogo administrativo...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Crear / Editar Compuesto -->
+  <div class="modal-overlay" id="modal-form-overlay" role="dialog" aria-modal="true" aria-labelledby="form-modal-title">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 class="modal-title" id="form-modal-title">Agregar nuevo compuesto</h3>
+        <button class="modal-close" id="btn-close-form-modal" aria-label="Cerrar">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <form id="peptido-form" novalidate>
+          <input type="hidden" id="form-peptido-id" value="">
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="form-nombre" class="form-label">Nombre del compuesto *</label>
+              <input type="text" id="form-nombre" class="form-input" required maxlength="150" placeholder="ej. Wolverine o BPC-157">
+              <div class="field-error" id="err-nombre">El nombre es obligatorio.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="form-categoria" class="form-label">Categoría *</label>
+              <input type="text" id="form-categoria" class="form-input" required maxlength="100" placeholder="ej. Medicamento peptídico o Coenzima">
+              <div class="field-error" id="err-categoria">La categoría es obligatoria.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-subtitulo" class="form-label">Subtítulo o descripción breve *</label>
+            <input type="text" id="form-subtitulo" class="form-input" required maxlength="250" placeholder="ej. Agonista de los receptores GIP y GLP-1">
+            <div class="field-error" id="err-subtitulo">El subtítulo es obligatorio.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-que-es" class="form-label">¿Qué es? *</label>
+            <textarea id="form-que-es" class="form-textarea" rows="3" required placeholder="Definición química, biológica y farmacológica rigurosa..."></textarea>
+            <div class="field-error" id="err-que-es">Este campo es obligatorio.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-que-hace" class="form-label">¿Qué hace o qué se estudia? *</label>
+            <textarea id="form-que-hace" class="form-textarea" rows="3" required placeholder="Mecanismo de acción, vías neuroendocrinas o modelo preclínico..."></textarea>
+            <div class="field-error" id="err-que-hace">Este campo es obligatorio.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-uso-medico" class="form-label">Uso médico autorizado o contexto de investigación</label>
+            <textarea id="form-uso-medico" class="form-textarea" rows="2" placeholder="Indicaciones aprobadas (ej. FDA, COFEPRIS) o estado en fase experimental..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="form-clave" class="form-label">Advertencia o mensaje clave *</label>
+            <textarea id="form-clave" class="form-textarea" rows="2" required placeholder="Avisos sobre seguridad, falta de regulación o precauciones indispensables..."></textarea>
+            <div class="field-error" id="err-clave">El mensaje clave es obligatorio.</div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="form-fuente" class="form-label">Fuentes científicas y regulatorias</label>
+              <input type="text" id="form-fuente" class="form-input" placeholder="ej. FDA · NIH PubChem · PMID...">
+            </div>
+
+            <div class="form-group">
+              <label for="form-imagen" class="form-label">Ruta de imagen institucional</label>
+              <input type="text" id="form-imagen" class="form-input" placeholder="ej. /assets/images/wolverine.jpeg">
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-form">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-save-peptido">
+          <span id="save-btn-text">Guardar compuesto</span>
+          <span id="save-btn-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Ver Detalle Técnico -->
+  <div class="modal-overlay" id="modal-view-overlay" role="dialog" aria-modal="true" aria-labelledby="view-modal-title">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 class="modal-title" id="view-modal-title">Ficha Científica del Compuesto</h3>
+        <button class="modal-close" id="btn-close-view-modal" aria-label="Cerrar">&times;</button>
+      </header>
+
+      <div class="modal-body" id="view-modal-body">
+        <!-- Contenido inyectado dinámicamente -->
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-view">Cerrar</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar Eliminación -->
+  <div class="modal-overlay" id="modal-delete-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div class="modal-card" style="max-width: 480px;">
+      <header class="modal-header">
+        <h3 class="modal-title" id="delete-modal-title" style="color: var(--danger);">Confirmar Eliminación</h3>
+        <button class="modal-close" id="btn-close-delete-modal" aria-label="Cerrar">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <p style="margin-bottom: 1rem;">¿Estás seguro de que deseas eliminar permanentemente el compuesto <strong id="delete-compound-name"></strong> (ID: <span id="delete-compound-id"></span>)?</p>
+        <div class="alert alert-danger" style="display: block;">
+          ⚠️ Esta acción eliminará el registro de la base de datos MySQL y dejará de mostrarse inmediatamente en el catálogo público.
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-delete">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete">
+          <span id="del-btn-text">Eliminar definitivamente</span>
+          <span id="del-btn-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Contenedor Toast para Notificaciones -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
