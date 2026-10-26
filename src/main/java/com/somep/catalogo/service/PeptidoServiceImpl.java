@@ -42,6 +42,7 @@ public class PeptidoServiceImpl implements PeptidoService {
         }
 
         return entidades.stream()
+                .sorted((a, b) -> Long.compare(b.getId() != null ? b.getId() : 0L, a.getId() != null ? a.getId() : 0L))
                 .map(PeptidoResponse::fromEntity)
                 .collect(Collectors.toList());
     }

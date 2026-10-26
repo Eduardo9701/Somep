@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('table-body');
     const btnOpenCreateModal = document.getElementById('btn-open-create-modal');
 
-    // Modales
+    // Modales y Formulario
     const modalFormOverlay = document.getElementById('modal-form-overlay');
     const formModalTitle = document.getElementById('form-modal-title');
     const peptidoForm = document.getElementById('peptido-form');
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sesionValida) return;
 
         await obtenerCsrfToken();
-        await Promise.all([cargarEstadisticas(), cargarPeptidos()]);
+        await Promise.all([cargarEstadisticas(), cargarPeptidos(true)]);
         inicializarEventos();
     }
 
@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return false;
             }
 
-            userDisplayName.textContent = data.nombreCompleto || data.username;
-            userDisplayRole.textContent = data.role === 'ROLE_ADMIN' ? 'Administrador General' : data.role;
-            userAvatar.textContent = (data.nombreCompleto || data.username).charAt(0).toUpperCase();
+            if (userDisplayName) userDisplayName.textContent = data.nombreCompleto || data.username;
+            if (userDisplayRole) userDisplayRole.textContent = data.role === 'ROLE_ADMIN' ? 'Administrador General' : data.role;
+            if (userAvatar) userAvatar.textContent = (data.nombreCompleto || data.username).charAt(0).toUpperCase();
             return true;
         } catch (error) {
             window.location.replace('/admin/login.html');
@@ -120,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (ignored) {
         } finally {
-            // Limpiar cookies de sesión en el navegador
             document.cookie = 'JSESSIONID=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             document.cookie = 'XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             window.location.href = '/admin/login.html?logout=true';
@@ -170,48 +169,66 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/admin/peptidos/stats');
             if (res.ok) {
                 const stats = await res.json();
-                statTotalCompuestos.textContent = stats.totalCompuestos;
-                statTotalCategorias.textContent = stats.totalCategorias;
-                if (stats.ultimaActualizacion) {
-                    const fecha = new Date(stats.ultimaActualizacion);
-                    statUltimaAct.textContent = fecha.toLocaleString('es-MX', {
-                        day: '2-digit', month: 'short', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit'
-                    });
-                } else {
-                    statUltimaAct.textContent = 'Al día';
+                if (statTotalCompuestos) statTotalCompuestos.textContent = stats.totalCompuestos;
+                if (statTotalCategorias) statTotalCategorias.textContent = stats.totalCategorias;
+                if (statUltimaAct) {
+                    if (stats.ultimaActualizacion) {
+                        const fecha = new Date(stats.ultimaActualizacion);
+                        statUltimaAct.textContent = fecha.toLocaleString('es-MX', {
+                            day: '2-digit', month: 'short', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    } else {
+                        statUltimaAct.textContent = 'Al día';
+                    }
                 }
             }
         } catch (e) {
-            statTotalCompuestos.textContent = '—';
-            statTotalCategorias.textContent = '—';
-            statUltimaAct.textContent = '—';
+            if (statTotalCompuestos) statTotalCompuestos.textContent = '—';
+            if (statTotalCategorias) statTotalCategorias.textContent = '—';
+            if (statUltimaAct) statUltimaAct.textContent = '—';
         }
     }
 
     // 4. Cargar y Renderizar Catálogo en vivo
-    async function cargarPeptidos() {
+    async function cargarPeptidos(mostrarSpinner = false) {
         try {
+            if (mostrarSpinner && (!todosLosPeptidos || todosLosPeptidos.length === 0)) {
+                tableBody.innerHTML = `
+                    <tr>
+                      <td colspan="6" class="empty-state">
+                        <div class="spinner" style="border-top-color: var(--primary); width: 2rem; height: 2rem;"></div>
+                        <p style="margin-top: 1rem;">Cargando registros...</p>
+                      </td>
+                    </tr>
+                `;
+            }
+
             const res = await fetch('/api/admin/peptidos');
             if (!res.ok) throw new Error('Error al consultar el catálogo');
 
             todosLosPeptidos = await res.json();
+            // Ordenar siempre por ID descendente para que los recién creados aparezcan de primero arriba
+            todosLosPeptidos.sort((a, b) => (b.id || 0) - (a.id || 0));
             actualizarOpcionesCategorias();
-            renderizarTabla(todosLosPeptidos);
+            aplicarFiltros();
         } catch (error) {
-            tableBody.innerHTML = `
-                <tr>
-                  <td colspan="6" class="empty-state">
-                    <div class="empty-state-icon">⚠️</div>
-                    <p>No fue posible cargar el catálogo. Por favor verifique la conexión.</p>
-                  </td>
-                </tr>
-            `;
+            if (mostrarSpinner && (!todosLosPeptidos || todosLosPeptidos.length === 0)) {
+                tableBody.innerHTML = `
+                    <tr>
+                      <td colspan="6" class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p>No fue posible cargar el catálogo. Por favor verifique la conexión.</p>
+                      </td>
+                    </tr>
+                `;
+            }
             mostrarToast('Error al conectar con el servidor', 'danger');
         }
     }
 
     function actualizarOpcionesCategorias() {
+        if (!categoryFilter) return;
         const categoriaActual = categoryFilter.value;
         const categorias = Array.from(new Set(todosLosPeptidos.map(p => p.categoria).filter(Boolean))).sort();
 
@@ -277,8 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Filtros y Búsqueda
     function aplicarFiltros() {
-        const texto = searchInput.value.toLowerCase().trim();
-        const cat = categoryFilter.value;
+        const texto = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const cat = categoryFilter ? categoryFilter.value : '';
 
         const filtrados = todosLosPeptidos.filter(p => {
             const coincideTexto = !texto ||
@@ -321,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('form-uso-medico').value = peptido.usoMedico || '';
         document.getElementById('form-clave').value = peptido.clave || '';
         document.getElementById('form-fuente').value = peptido.fuente || '';
-        formImagen.value = peptido.imagenUrl || '';
+        if (formImagen) formImagen.value = peptido.imagenUrl || '';
 
         if (peptido.imagenUrl) {
             mostrarPreviewImagen(peptido.imagenUrl, peptido.nombre);
@@ -413,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const usoMedico = document.getElementById('form-uso-medico').value.trim();
         const clave = document.getElementById('form-clave').value.trim();
         const fuente = document.getElementById('form-fuente').value.trim();
-        const imagenUrl = formImagen.value.trim();
+        const imagenUrl = formImagen ? formImagen.value.trim() : '';
 
         let valido = true;
 
@@ -462,10 +479,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 cerrarModalFormulario();
                 mostrarToast(esEdicion ? 'Compuesto actualizado correctamente.' : 'Compuesto registrado exitosamente.', 'success');
                 
-                // Actualización inmediata en el DOM sin recargar la página
-                await Promise.all([cargarEstadisticas(), cargarPeptidos()]);
-                
-                // Notificar a otras pestañas y al catálogo público en vivo
+                // INSERCIÓN INMEDIATA EN MEMORIA Y RENDERIZADO AL INSTANTE
+                if (esEdicion) {
+                    const idx = todosLosPeptidos.findIndex(p => p.id === data.id);
+                    if (idx !== -1) {
+                        todosLosPeptidos[idx] = data;
+                    }
+                } else {
+                    // Colocar el nuevo compuesto AL INICIO de la lista (arriba del todo)
+                    todosLosPeptidos.unshift(data);
+                }
+
+                // Limpiar filtros para que el nuevo compuesto se muestre de inmediato en pantalla
+                if (searchInput) searchInput.value = '';
+                if (categoryFilter) categoryFilter.value = '';
+                actualizarOpcionesCategorias();
+                aplicarFiltros();
+
+                // Resaltar la fila recién agregada o modificada
+                resaltarFila(data.id || id);
+
+                // Refrescar métricas y notificar a otras pestañas
+                cargarEstadisticas();
                 notificarSincronizacion(esEdicion ? 'UPDATE' : 'CREATE', data.id || id);
             } else {
                 mostrarToast(data.mensaje || 'Error al guardar los datos.', 'danger');
@@ -477,12 +512,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function resaltarFila(id) {
+        setTimeout(() => {
+            const tr = document.querySelector(`tr[data-id="${id}"]`);
+            if (tr) {
+                tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                tr.style.transition = 'background-color 0.4s ease';
+                tr.style.backgroundColor = 'rgba(197, 160, 89, 0.35)';
+                setTimeout(() => {
+                    tr.style.backgroundColor = '';
+                }, 2500);
+            }
+        }, 80);
+    }
+
     function mostrarErrorCampo(inputId, errorId, mensaje) {
         const input = document.getElementById(inputId);
         const err = document.getElementById(errorId);
-        input.classList.add('is-invalid');
-        err.textContent = mensaje;
-        err.style.display = 'block';
+        if (input) input.classList.add('is-invalid');
+        if (err) {
+            err.textContent = mensaje;
+            err.style.display = 'block';
+        }
     }
 
     function limpiarErroresFormulario() {
@@ -599,9 +650,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarToast('Compuesto eliminado correctamente de la base de datos.', 'success');
                 
                 // Actualización inmediata sin recargar la página
-                await Promise.all([cargarEstadisticas(), cargarPeptidos()]);
-                
-                // Notificar sincronización en vivo
+                todosLosPeptidos = todosLosPeptidos.filter(p => p.id !== idAEliminar);
+                actualizarOpcionesCategorias();
+                aplicarFiltros();
+
+                cargarEstadisticas();
                 notificarSincronizacion('DELETE', idAEliminar);
             } else {
                 const data = await res.json();
@@ -654,7 +707,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Control interactivo de subida de imagen desde el dispositivo
         if (dropzoneArea && formImagenFile) {
             dropzoneArea.addEventListener('click', (e) => {
-                // Si el clic no fue en los botones internos de quitar o cambiar
                 if (!e.target.closest('#btn-remove-preview') && !e.target.closest('#btn-change-image')) {
                     formImagenFile.click();
                 }

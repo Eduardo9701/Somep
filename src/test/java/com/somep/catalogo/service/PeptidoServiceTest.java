@@ -69,7 +69,8 @@ class PeptidoServiceTest {
         List<PeptidoResponse> resultado = peptidoService.listarPeptidos(null, null);
 
         assertEquals(2, resultado.size());
-        assertEquals("Tirzepatida", resultado.get(0).getNombre());
+        assertEquals(2L, resultado.get(0).getId()); // Más reciente primero (id 2L)
+        assertEquals(1L, resultado.get(1).getId());
         verify(peptidoRepository, times(1)).findAll();
     }
 
