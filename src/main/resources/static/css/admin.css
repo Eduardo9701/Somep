@@ -218,6 +218,12 @@ body {
     border: 1px solid #BBF7D0;
 }
 
+.alert-warning {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
 .login-footer-links {
     margin-top: 1.5rem;
     text-align: center;

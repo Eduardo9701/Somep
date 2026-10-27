@@ -47,7 +47,13 @@ public class AuthController {
             securityContext.setAuthentication(authentication);
             SecurityContextHolder.setContext(securityContext);
 
-            // Persistir la sesión en el request
+            // Invalidar sesión anterior si existiese para prevenir fijación de sesión
+            HttpSession oldSession = request.getSession(false);
+            if (oldSession != null) {
+                oldSession.invalidate();
+            }
+
+            // Persistir la nueva sesión en el request
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
@@ -101,7 +107,11 @@ public class AuthController {
                 usuario.getRole()
         );
 
-        return ResponseEntity.ok(authResponse);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate")
+                .header(org.springframework.http.HttpHeaders.PRAGMA, "no-cache")
+                .header(org.springframework.http.HttpHeaders.EXPIRES, "0")
+                .body(authResponse);
     }
 
     @PostMapping("/logout")

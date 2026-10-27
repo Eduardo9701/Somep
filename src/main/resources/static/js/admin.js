@@ -66,6 +66,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toastContainer = document.getElementById('toast-container');
 
+    // Estado de control de redirección
+    let redirigiendoALogin = false;
+
+    function redirigirALoginExpirado(mensaje) {
+        if (redirigiendoALogin) return;
+        redirigiendoALogin = true;
+
+        mostrarToast(mensaje || 'Tu sesión ha expirado o el servidor se reinició. Redirigiendo a inicio de sesión...', 'danger');
+        cerrarModalFormulario();
+        cerrarModalDelete();
+
+        setTimeout(() => {
+            window.location.replace('/admin/login.html?expired=true');
+        }, 1200);
+    }
+
     // 1. Inicialización: Verificar sesión y cargar datos iniciales
     iniciarPanel();
 
@@ -81,14 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Manejo de Seguridad y Sesión
     async function verificarSesion() {
         try {
-            const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+            const res = await fetch('/api/auth/me', {
+                credentials: 'same-origin',
+                cache: 'no-store',
+                headers: { 'Accept': 'application/json' }
+            });
+
             if (!res.ok) {
-                window.location.replace('/admin/login.html');
+                redirigirALoginExpirado();
                 return false;
             }
             const data = await res.json();
-            if (!data.autenticado) {
-                window.location.replace('/admin/login.html');
+            if (!data.autenticado || data.role !== 'ROLE_ADMIN') {
+                redirigirALoginExpirado();
                 return false;
             }
 
@@ -97,20 +118,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userAvatar) userAvatar.textContent = (data.nombreCompleto || data.username).charAt(0).toUpperCase();
             return true;
         } catch (error) {
-            window.location.replace('/admin/login.html');
+            redirigirALoginExpirado();
             return false;
         }
     }
 
     // Cliente HTTP centralizado con manejo automático de CSRF, cookies y caducidad de sesión
-    async function authFetch(url, options = {}) {
+    async function authFetch(url, options = {}, esReintento = false) {
         options.credentials = 'same-origin';
         options.headers = options.headers || {};
 
         const metodo = (options.method || 'GET').toUpperCase();
         if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(metodo)) {
-            const token = await obtenerCsrfToken();
-            if (token && !options.headers['X-XSRF-TOKEN']) {
+            const token = await obtenerCsrfToken(esReintento);
+            if (token) {
                 options.headers['X-XSRF-TOKEN'] = token;
             }
         }
@@ -118,13 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch(url, options);
 
         if (res.status === 401) {
-            mostrarToast('Tu sesión ha expirado o el servidor se reinició. Redirigiendo a inicio de sesión...', 'danger');
-            cerrarModalFormulario();
-            cerrarModalDelete();
-            setTimeout(() => {
-                window.location.replace('/admin/login.html');
-            }, 1200);
+            redirigirALoginExpirado('Tu sesión ha expirado o el servidor se reinició. Redirigiendo a inicio de sesión...');
             throw new Error('Sesión no autorizada o expirada');
+        }
+
+        // Si devuelve 403 Forbidden en operaciones de modificación, intentar revalidar CSRF una sola vez
+        if (res.status === 403 && !esReintento && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(metodo)) {
+            csrfTokenCached = null;
+            return authFetch(url, options, true);
         }
 
         return res;
@@ -154,15 +176,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function obtenerCsrfToken() {
-        const cookieToken = getCookie('XSRF-TOKEN');
-        if (cookieToken) {
-            csrfTokenCached = cookieToken;
-            return cookieToken;
+    async function obtenerCsrfToken(forzarRefresco = false) {
+        if (!forzarRefresco) {
+            const cookieToken = getCookie('XSRF-TOKEN');
+            if (cookieToken) {
+                csrfTokenCached = cookieToken;
+                return cookieToken;
+            }
         }
 
         try {
-            const res = await fetch('/api/auth/csrf', { credentials: 'same-origin' });
+            const res = await fetch('/api/auth/csrf', {
+                credentials: 'same-origin',
+                cache: 'no-store'
+            });
             if (res.ok) {
                 const data = await res.json();
                 if (data.token) {
