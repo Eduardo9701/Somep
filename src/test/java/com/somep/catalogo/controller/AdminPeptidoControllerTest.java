@@ -40,14 +40,15 @@ class AdminPeptidoControllerTest {
     @Test
     @DisplayName("GET /api/admin/peptidos/stats retorna estadísticas del catálogo")
     void testObtenerEstadisticas() throws Exception {
-        AdminStatsResponse stats = new AdminStatsResponse(11L, 5L, null);
+        AdminStatsResponse stats = new AdminStatsResponse(11L, 5L, 3L, null);
         given(peptidoService.obtenerEstadisticas()).willReturn(stats);
 
         mockMvc.perform(get("/api/admin/peptidos/stats")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalCompuestos", is(11)))
-                .andExpect(jsonPath("$.totalCategorias", is(5)));
+                .andExpect(jsonPath("$.totalCategorias", is(5)))
+                .andExpect(jsonPath("$.totalCursos", is(3)));
     }
 
     @Test

@@ -72,7 +72,17 @@
     tabDataBtn: document.getElementById('tab-data-btn'),
     tabInfographicBtn: document.getElementById('tab-infographic-btn'),
     modalDataPane: document.getElementById('modal-data-pane'),
-    modalInfographicPane: document.getElementById('modal-infographic-pane')
+    modalInfographicPane: document.getElementById('modal-infographic-pane'),
+
+    // Modal de Volante de Membresías
+    flyerModal: document.getElementById('flyer-modal'),
+    flyerModalCloseBtn: document.getElementById('flyer-modal-close-btn'),
+    flyerModalCloseBtnBottom: document.getElementById('flyer-modal-close-btn-bottom'),
+    flyerModalImg: document.getElementById('flyer-modal-img'),
+    flyerModalBadge: document.getElementById('flyer-modal-badge'),
+    flyerModalTitle: document.getElementById('flyer-modal-title'),
+    flyerModalWaBtn: document.getElementById('flyer-modal-wa-btn'),
+    flyerModalWaText: document.getElementById('flyer-modal-wa-text')
   };
 
   // Canal de sincronización en tiempo real con el panel administrativo
@@ -84,9 +94,11 @@
   document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupAcademyFilters();
+    setupMembershipsModal();
     setupNavigationHighlight();
     setupRealtimeSync();
     fetchInitialData();
+    fetchCursos();
   });
 
   /**
@@ -96,7 +108,15 @@
     // 1. Mensaje directo desde el panel administrativo en la misma sesión/navegador
     if (somepSyncChannel) {
       somepSyncChannel.onmessage = (event) => {
-        if (event.data && event.data.action === 'catalog_updated') {
+        if (!event.data) return;
+
+        if (event.data.action === 'courses_updated') {
+          if (event.data.eventType === 'DELETE' && event.data.id) {
+            eliminarTarjetaCursoAnimada(event.data.id);
+          } else {
+            fetchCursos();
+          }
+        } else if (event.data.action === 'catalog_updated') {
           fetchInitialData();
         }
       };
@@ -105,21 +125,50 @@
     // 2. Evento de Storage para pestañas cruzadas
     window.addEventListener('storage', (e) => {
       if (e.key === 'somep_catalog_last_sync') {
+        try {
+          const syncData = JSON.parse(e.newValue);
+          if (syncData && syncData.action === 'courses_updated' && syncData.eventType === 'DELETE' && syncData.id) {
+            eliminarTarjetaCursoAnimada(syncData.id);
+            return;
+          }
+        } catch (_) {}
         fetchInitialData();
+        fetchCursos();
       }
     });
 
     // 3. Al cambiar de pestaña y regresar al catálogo
     window.addEventListener('focus', () => {
       fetchInitialData();
+      fetchCursos();
     });
 
     // 4. Polling suave cada 20 segundos para usuarios remotos en otros dispositivos
     setInterval(() => {
       if (!document.hidden && (!state.searchQuery || state.searchQuery === '')) {
         fetchInitialData(true); // carga silenciosa sin parpadeo
+        fetchCursos();
       }
     }, 20000);
+  }
+
+  function eliminarTarjetaCursoAnimada(id) {
+    const card = document.getElementById(`academy-card-${id}`) || document.querySelector(`.academy-card[data-id="${id}"]`);
+    if (card) {
+      card.style.transition = 'all 0.35s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.85)';
+      setTimeout(() => {
+        if (card.parentNode) card.remove();
+        cursosData = cursosData.filter(c => c.id != id);
+        if (cursosData.length === 0) {
+          renderCursos();
+        }
+      }, 320);
+    } else {
+      cursosData = cursosData.filter(c => c.id != id);
+      renderCursos();
+    }
   }
 
   /**
@@ -186,27 +235,131 @@
   }
 
   /**
+   * Estado y Gestión Dinámica de Programas Académicos (Cursos, Diplomados, Seminarios)
+   */
+  let cursosData = [];
+  let activeCursoFilter = 'all';
+
+  async function fetchCursos() {
+    const grid = document.getElementById('academy-grid');
+    if (!grid) return;
+
+    try {
+      const res = await fetch('/api/cursos');
+      if (!res.ok) throw new Error('Error HTTP ' + res.status);
+      cursosData = await res.json();
+    } catch (err) {
+      console.error('Error al cargar programas académicos desde la API:', err);
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; color: var(--color-text-muted);">
+          <p>No fue posible conectar con los programas académicos. Intente nuevamente más tarde.</p>
+        </div>
+      `;
+      return;
+    }
+
+    try {
+      renderCursos();
+    } catch (renderErr) {
+      console.error('Error al renderizar tarjetas de cursos:', renderErr);
+    }
+  }
+
+  function getBadgeClass(tipo) {
+    if (!tipo) return 'badge-course';
+    const t = tipo.toLowerCase();
+    if (t === 'seminario') return 'badge-seminar';
+    if (t === 'conferencia' || t === 'simposio') return 'badge-conference';
+    return 'badge-course';
+  }
+
+  function renderCursos() {
+    const grid = document.getElementById('academy-grid');
+    if (!grid) return;
+
+    if (!cursosData || cursosData.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--color-text-muted);">
+          <p style="font-size: 1.05rem; font-weight: 600; color: var(--color-purple);">No hay programas académicos dados de alta en este momento.</p>
+          <p style="font-size: 0.88rem; margin-top: 0.35rem;">Próximamente se publicará la nueva oferta formativa oficial.</p>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = '';
+    cursosData.forEach(curso => {
+      const cTipo = (curso.tipo || 'curso').toLowerCase();
+      const shouldShow = activeCursoFilter === 'all' || 
+                         cTipo === activeCursoFilter || 
+                         (activeCursoFilter === 'curso' && cTipo === 'diplomado');
+
+      const article = document.createElement('article');
+      article.className = 'academy-card';
+      article.id = `academy-card-${curso.id}`;
+      article.setAttribute('data-id', curso.id);
+      article.setAttribute('data-category', cTipo);
+      article.style.display = shouldShow ? 'flex' : 'none';
+
+      const badgeCls = getBadgeClass(curso.tipo);
+
+      article.innerHTML = `
+        <div class="academy-card-media">
+          <img src="${escapeHtml(curso.imagenUrl || 'assets/images/curso-peptidos.jpg')}" alt="${escapeHtml(curso.titulo)}" class="academy-card-img" loading="lazy" onerror="this.src='assets/images/curso-peptidos.jpg'">
+          <div class="academy-card-overlay">
+            <span class="badge-type ${badgeCls}">${escapeHtml(curso.badgeTipo || 'Curso')}</span>
+            <span class="badge-status">${escapeHtml(curso.estado || 'Convocatoria Abierta')}</span>
+          </div>
+        </div>
+        <div class="academy-card-content">
+          <div class="academy-meta-row">
+            ${curso.meta1 ? `
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                ${escapeHtml(curso.meta1)}
+              </span>
+            ` : ''}
+            ${curso.meta2 ? `
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+                ${escapeHtml(curso.meta2)}
+              </span>
+            ` : ''}
+          </div>
+          <h3 class="academy-card-title">${escapeHtml(curso.titulo)}</h3>
+          <p class="academy-card-desc">${escapeHtml(curso.descripcion)}</p>
+          ${curso.acreditacion ? `
+            <div class="academy-highlight-box">
+              <div class="highlight-mini-header">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <span>Acreditación SOMEP</span>
+              </div>
+              <p class="highlight-mini-text">${escapeHtml(curso.acreditacion)}</p>
+            </div>
+          ` : ''}
+          <div class="academy-card-actions">
+            <a href="${escapeHtml(curso.enlaceWhatsapp || 'https://wa.me/525579247494')}" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
+              <span>${escapeHtml(curso.textoBoton || 'Solicitar Programa e Inscripción')}</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+          </div>
+        </div>
+      `;
+      grid.appendChild(article);
+    });
+  }
+
+  /**
    * Filtros de la Sección Academia (Cursos, Seminarios, Conferencias)
    */
   function setupAcademyFilters() {
     const filterButtons = document.querySelectorAll('.academy-filter-btn');
-    const academyCards = document.querySelectorAll('.academy-card');
-
     filterButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         filterButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        const filterValue = btn.getAttribute('data-filter');
-
-        academyCards.forEach(card => {
-          const cardCategory = card.getAttribute('data-category');
-          if (filterValue === 'all' || cardCategory === filterValue) {
-            card.style.display = 'flex';
-          } else {
-            card.style.display = 'none';
-          }
-        });
+        activeCursoFilter = btn.getAttribute('data-filter') || 'all';
+        renderCursos();
       });
     });
   }
@@ -216,7 +369,7 @@
    */
   function setupNavigationHighlight() {
     const navLinks = document.querySelectorAll('.nav-link');
-    const sections = ['catalogo', 'academia', 'contacto'];
+    const sections = ['catalogo', 'academia', 'membresias', 'contacto'];
 
     window.addEventListener('scroll', () => {
       let current = '';
@@ -239,6 +392,58 @@
           link.classList.add('active');
         }
       });
+    });
+  }
+
+  /**
+   * Manejo del modal para visualizar volantes oficiales de membresías (Silver & Gold)
+   */
+  function setupMembershipsModal() {
+    if (!DOM.flyerModal) return;
+
+    const zoomBtns = document.querySelectorAll('.btn-zoom-flyer');
+    zoomBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tier = btn.getAttribute('data-flyer');
+        if (tier === 'silver') {
+          DOM.flyerModalImg.src = 'assets/images/membresia-silver.jpg';
+          DOM.flyerModalImg.alt = 'Volante Oficial SOMEP Membresía Silver';
+          DOM.flyerModalBadge.textContent = 'Membresía Silver Oficial';
+          DOM.flyerModalBadge.className = 'category-badge';
+          DOM.flyerModalTitle.textContent = 'Membresía Silver — $999 MXN Anual';
+          DOM.flyerModalWaBtn.href = 'https://wa.me/525579247494?text=Hola%20SOMEP%2C%20deseo%20adquirir%20la%20Membres%C3%ADa%20Silver%20(%24999%20MXN%2Fanual)%20y%20solicitar%20informaci%C3%B3n%20para%20el%20pago%20y%20registro.';
+          DOM.flyerModalWaText.textContent = 'Solicitar Membresía Silver vía WhatsApp';
+        } else {
+          DOM.flyerModalImg.src = 'assets/images/membresia-gold.jpg';
+          DOM.flyerModalImg.alt = 'Volante Oficial SOMEP Membresía Gold';
+          DOM.flyerModalBadge.textContent = 'Membresía Gold Premium';
+          DOM.flyerModalBadge.className = 'category-badge badge-gold';
+          DOM.flyerModalTitle.textContent = 'Membresía Gold — $1,999 MXN Anual';
+          DOM.flyerModalWaBtn.href = 'https://wa.me/525579247494?text=Hola%20SOMEP%2C%20deseo%20adquirir%20la%20Membres%C3%ADa%20Gold%20(%241%2C999%20MXN%2Fanual)%20y%20solicitar%20informaci%C3%B3n%20para%20el%20pago%20y%20registro.';
+          DOM.flyerModalWaText.textContent = 'Solicitar Membresía Gold vía WhatsApp';
+        }
+        DOM.flyerModal.hidden = false;
+        document.body.classList.add('modal-open');
+      });
+    });
+
+    const closeFlyerModal = () => {
+      DOM.flyerModal.hidden = true;
+      document.body.classList.remove('modal-open');
+    };
+
+    DOM.flyerModalCloseBtn?.addEventListener('click', closeFlyerModal);
+    DOM.flyerModalCloseBtnBottom?.addEventListener('click', closeFlyerModal);
+    DOM.flyerModal.addEventListener('click', (e) => {
+      if (e.target === DOM.flyerModal) {
+        closeFlyerModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !DOM.flyerModal.hidden) {
+        closeFlyerModal();
+      }
     });
   }
 
@@ -678,6 +883,17 @@
     DOM.emptyState.hidden = false;
     DOM.cardsGrid.innerHTML = '';
     DOM.paginationNav.hidden = true;
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text
+      .toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
 })();

@@ -1,7 +1,9 @@
 package com.somep.catalogo.config;
 
+import com.somep.catalogo.model.Curso;
 import com.somep.catalogo.model.Peptido;
 import com.somep.catalogo.model.Usuario;
+import com.somep.catalogo.repository.CursoRepository;
 import com.somep.catalogo.repository.PeptidoRepository;
 import com.somep.catalogo.repository.UsuarioRepository;
 import org.slf4j.Logger;
@@ -15,7 +17,7 @@ import java.util.List;
 
 /**
  * Inicializador seguro y reproducible para la carga inicial de los registros
- * científicos y el usuario administrador inicial en MySQL.
+ * científicos, cursos académicos y el usuario administrador inicial en MySQL.
  * Garantiza idempotencia: si los registros ya existen, no los duplica.
  */
 @Component
@@ -23,13 +25,16 @@ public class DataInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
     private final PeptidoRepository peptidoRepository;
+    private final CursoRepository cursoRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(PeptidoRepository peptidoRepository,
+                           CursoRepository cursoRepository,
                            UsuarioRepository usuarioRepository,
                            PasswordEncoder passwordEncoder) {
         this.peptidoRepository = peptidoRepository;
+        this.cursoRepository = cursoRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -38,6 +43,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         inicializarUsuarioAdmin();
         inicializarCatalogoPeptidos();
+        inicializarCursosAcademicos();
     }
 
     private void inicializarUsuarioAdmin() {
@@ -219,5 +225,67 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("Inicialización completada: {} nuevos compuestos registrados. Total en base de datos: {}",
                 nuevos, peptidoRepository.count());
+    }
+
+    private void inicializarCursosAcademicos() {
+        if (cursoRepository.count() == 0) {
+            log.info("Cargando programas académicos iniciales en la base de datos...");
+
+            List<Curso> cursosIniciales = Arrays.asList(
+                // 1. Diplomado Internacional (curso)
+                new Curso(
+                    "curso",
+                    "Curso con Constancia",
+                    "Inscripciones Abiertas",
+                    "Diplomado Internacional en Terapéutica Peptídica y Bioquímica Celular",
+                    "60 Horas Académicas",
+                    "Modalidad Online Asíncrona + Tutoría",
+                    "Formación exhaustiva sobre la bioquímica y farmacocinética de péptidos bioactivos, receptores hormonales acoplados a proteínas G, cascadas de señalización y análisis crítico de la literatura preclínica y clínica internacional.",
+                    "Acreditación SOMEP: Constancia con folio de registro institucional único, desglose curricular de horas crédito y verificación digital QR.",
+                    "https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20sobre%20el%20Diplomado%20Internacional%20en%20Terap%C3%A9utica%20Pept%C3%ADdica",
+                    "Solicitar Programa e Inscripción",
+                    "/assets/images/curso-peptidos.jpg",
+                    1,
+                    true
+                ),
+                // 2. Seminario Avanzado (seminario)
+                new Curso(
+                    "seminario",
+                    "Seminario Clínico",
+                    "Próxima Edición",
+                    "Seminario Avanzado: Agonistas GLP-1 / GIP / Glucagón y Nuevas Moléculas Metabólicas",
+                    "16 Horas Teórico-Prácticas",
+                    "Sesiones en Vivo con Expertos",
+                    "Actualización profunda sobre tirzepatida, retatrutide e incretinas sintéticas. Revisión de mecanismos fisiopatológicos, perfiles de seguridad, manejo de reacciones adversas y marco regulatorio vigente ante COFEPRIS y FDA.",
+                    "Acreditación SOMEP: Constancia institucional de actualización médica continua con evaluación de casos y constancia foliada.",
+                    "https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20sobre%20el%20Seminario%20de%20Agonistas%20GLP-1%20y%20GIP",
+                    "Solicitar Programa e Inscripción",
+                    "/assets/images/seminario-metabolico.jpg",
+                    2,
+                    true
+                ),
+                // 3. Simposio Nacional (conferencia)
+                new Curso(
+                    "conferencia",
+                    "Simposio Nacional",
+                    "Convocatoria 2026",
+                    "I Simposio Nacional SOMEP: Fronteras Científicas en Péptidos y Medicina de Precisión",
+                    "Híbrido: CDMX & Streaming",
+                    "Mesas de Diálogo y Vinculación",
+                    "El evento magno de vinculación científica. Conferencias magistrales con investigadores y docentes sobre neuroprotección (Semax, Cerebrolysin), equilibrio redox (Glutatión, NAD) y el futuro del portafolio documentado en México.",
+                    "Acreditación SOMEP: Constancia oficial de asistencia institucional con código QR y valor curricular para miembros de la sociedad.",
+                    "https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20para%20asistir%20al%20I%20Simposio%20Nacional%20SOMEP",
+                    "Reservar Lugar / Información",
+                    "/assets/images/conferencia-anual.jpg",
+                    3,
+                    true
+                )
+            );
+
+            cursoRepository.saveAll(cursosIniciales);
+            log.info("Inicialización de cursos completada: {} programas registrados exitosamente.", cursosIniciales.size());
+        } else {
+            log.info("Cursos académicos existentes en base de datos: {} registrados.", cursoRepository.count());
+        }
     }
 }

@@ -26,6 +26,9 @@ class PeptidoServiceTest {
     @Mock
     private PeptidoRepository peptidoRepository;
 
+    @Mock
+    private com.somep.catalogo.repository.CursoRepository cursoRepository;
+
     @InjectMocks
     private PeptidoServiceImpl peptidoService;
 

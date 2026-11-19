@@ -1477,6 +1477,483 @@ a {
 }
 
 /* ==========================================================================
+   SECCIÓN: COMUNIDAD Y MEMBRESÍAS SOMEP (SILVER & GOLD)
+   ========================================================================== */
+.memberships-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F4 50%, #F5EFE6 100%);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: 5rem 0 4.5rem;
+  position: relative;
+}
+
+.membership-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-gold-subtle);
+  color: var(--color-purple);
+  border: 1px solid var(--color-border-gold);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0.4rem 1.1rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+}
+
+.memberships-header-block {
+  text-align: center;
+  max-width: 860px;
+  margin: 0.75rem auto 3rem;
+}
+
+.memberships-main-title {
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-purple);
+  line-height: 1.25;
+  margin-bottom: 0.85rem;
+}
+
+.memberships-lead {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.memberships-lead strong {
+  color: var(--color-green);
+}
+
+.memberships-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  max-width: 1040px;
+  margin: 0 auto 3.25rem;
+  align-items: stretch;
+}
+
+.membership-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(74, 21, 75, 0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 1px solid var(--color-border);
+}
+
+.membership-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(74, 21, 75, 0.13);
+}
+
+.membership-silver {
+  border-color: #D1D5DB;
+}
+
+.membership-silver:hover {
+  border-color: #9CA3AF;
+}
+
+.membership-gold.featured-tier {
+  border: 2px solid var(--color-gold);
+  box-shadow: 0 10px 30px rgba(197, 160, 89, 0.22);
+}
+
+.membership-gold.featured-tier:hover {
+  border-color: #AA771C;
+  box-shadow: 0 20px 45px rgba(197, 160, 89, 0.32);
+}
+
+.membership-badge-top {
+  text-align: center;
+  padding: 0.55rem 1rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.tier-silver {
+  background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 50%, #9CA3AF 100%);
+  color: #1F2937;
+  display: block;
+}
+
+.tier-gold {
+  background: linear-gradient(135deg, #FDE68A 0%, #D4AF37 50%, #9A6E0C 100%);
+  color: #2E1901;
+  display: block;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.membership-media-wrap {
+  position: relative;
+  height: 270px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #FAF9F6 0%, #E5E7EB 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.membership-flyer-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.5s ease;
+}
+
+.membership-card:hover .membership-flyer-img {
+  transform: scale(1.04);
+}
+
+.btn-zoom-flyer {
+  position: absolute;
+  bottom: 0.85rem;
+  right: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  color: var(--color-purple);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(74, 21, 75, 0.18);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  transition: all 0.2s ease;
+}
+
+.btn-zoom-flyer:hover {
+  background: #FFFFFF;
+  color: var(--color-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 21, 75, 0.22);
+}
+
+.btn-zoom-gold {
+  border-color: var(--color-gold);
+  color: #613E00;
+}
+
+.membership-card-content {
+  padding: 1.85rem 2rem 2.2rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.membership-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.85rem;
+}
+
+.membership-tier-name {
+  font-family: var(--font-serif);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--color-purple);
+}
+
+.membership-society {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--color-green);
+  background-color: var(--color-green-subtle);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.gold-society {
+  color: #7B4C00;
+  background-color: #FAF2DF;
+  border: 1px solid var(--color-border-gold);
+}
+
+.membership-price-box {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.gold-price-box {
+  background: linear-gradient(135deg, #FFFDF8 0%, #FAF5E8 100%);
+  border-color: var(--color-border-gold);
+}
+
+.price-amount-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  line-height: 1;
+}
+
+.price-val {
+  font-family: var(--font-serif);
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: var(--color-purple);
+  letter-spacing: -0.5px;
+}
+
+.price-curr {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-purple);
+}
+
+.price-period {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+}
+
+.membership-discount-banner {
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.discount-silver {
+  background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+  border: 1px solid #D1D5DB;
+  color: var(--color-purple);
+}
+
+.discount-gold {
+  background: linear-gradient(135deg, #FFF9EA 0%, #F6E6C2 100%);
+  border: 1px solid #DFBF7D;
+  color: #553300;
+}
+
+.discount-percent {
+  font-family: var(--font-brand, var(--font-serif));
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.discount-scope {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.membership-benefits-list {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.membership-benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.membership-benefits-list strong {
+  color: var(--color-text-main);
+}
+
+.check-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.check-gold {
+  fill: #B8860B;
+}
+
+.membership-action {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  text-align: center;
+}
+
+.btn-membership-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background-color: #25D366;
+  color: #FFFFFF;
+  padding: 0.95rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-membership-whatsapp:hover {
+  background-color: #20BA5C;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 22px rgba(37, 211, 102, 0.48);
+}
+
+.wa-icon {
+  flex-shrink: 0;
+}
+
+.membership-action-sub {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.membership-action-sub a {
+  color: var(--color-purple);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.membership-action-sub a:hover {
+  text-decoration: underline;
+}
+
+/* Pasos de Proceso */
+.membership-process-box {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border-gold);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+  box-shadow: var(--shadow-sm);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.process-box-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  color: var(--color-purple);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.process-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.process-step {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+}
+
+.step-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-purple);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.process-step:nth-child(2) .step-num {
+  background: var(--color-green);
+}
+
+.process-step:nth-child(3) .step-num {
+  background: var(--color-gold-dark);
+}
+
+.step-content strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--color-purple);
+  margin-bottom: 0.35rem;
+}
+
+.process-step p {
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Modal de Visualización de Volante */
+.flyer-modal-container {
+  max-width: 580px;
+  width: 92%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.flyer-modal-body {
+  padding: 1.25rem;
+  background-color: #1A1A1A;
+  text-align: center;
+  max-height: 72vh;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flyer-zoom-img {
+  max-width: 100%;
+  max-height: 68vh;
+  height: auto;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.flyer-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.75rem;
+}
+
+/* ==========================================================================
    Pie de Página Institucional SOMEP
    ========================================================================== */
 .site-footer {
@@ -1688,6 +2165,24 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .memberships-main-title {
+    font-size: 1.85rem;
+  }
+
+  .memberships-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .process-steps-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .membership-card-content {
+    padding: 1.5rem 1.25rem 1.75rem;
+  }
+
   .footer-container {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -1730,6 +2225,27 @@ a {
   }
 
   .academy-filter-btn {
+    width: 100%;
+  }
+
+  .memberships-main-title {
+    font-size: 1.6rem;
+  }
+
+  .price-val {
+    font-size: 2rem;
+  }
+
+  .discount-percent {
+    font-size: 1.15rem;
+  }
+
+  .flyer-modal-footer {
+    flex-direction: column;
+  }
+
+  .flyer-modal-footer .btn-membership-whatsapp,
+  .flyer-modal-footer .btn-secondary {
     width: 100%;
   }
 }

@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sesionValida) return;
 
         await obtenerCsrfToken();
-        await Promise.all([cargarEstadisticas(), cargarPeptidos(true)]);
+        await Promise.all([cargarEstadisticas(), cargarPeptidos(true), cargarCursos(true)]);
         inicializarEventos();
     }
 
@@ -127,6 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function authFetch(url, options = {}, esReintento = false) {
         options.credentials = 'same-origin';
         options.headers = options.headers || {};
+
+        if (options.body && typeof options.body === 'string' && !options.headers['Content-Type']) {
+            options.headers['Content-Type'] = 'application/json';
+        }
+        if (!options.headers['Accept']) {
+            options.headers['Accept'] = 'application/json';
+        }
 
         const metodo = (options.method || 'GET').toUpperCase();
         if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(metodo)) {
@@ -218,6 +225,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (ignored) {}
     }
 
+    function notificarSincronizacionCursos(accion, id) {
+        const payload = { action: 'courses_updated', eventType: accion, id, timestamp: Date.now() };
+        if (somepSyncChannel) {
+            somepSyncChannel.postMessage(payload);
+        }
+        try {
+            localStorage.setItem('somep_catalog_last_sync', JSON.stringify(payload));
+        } catch (ignored) {}
+    }
+
     // 3. Cargar Estadísticas
     async function cargarEstadisticas() {
         try {
@@ -226,6 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const stats = await res.json();
                 if (statTotalCompuestos) statTotalCompuestos.textContent = stats.totalCompuestos;
                 if (statTotalCategorias) statTotalCategorias.textContent = stats.totalCategorias;
+                const statTotalCursos = document.getElementById('stat-total-cursos');
+                if (statTotalCursos) statTotalCursos.textContent = stats.totalCursos !== undefined ? stats.totalCursos : 0;
                 if (statUltimaAct) {
                     if (stats.ultimaActualizacion) {
                         const fecha = new Date(stats.ultimaActualizacion);
@@ -808,14 +827,730 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnCancelDelete) btnCancelDelete.addEventListener('click', cerrarModalDelete);
         if (btnConfirmDelete) btnConfirmDelete.addEventListener('click', confirmarEliminar);
 
+        // ====================================================================
+        // Eventos del Módulo de Cursos y Formación Académica
+        // ====================================================================
+        const tabNavPeptidos = document.getElementById('tab-nav-peptidos');
+        const tabNavCursos = document.getElementById('tab-nav-cursos');
+        const panelPeptidos = document.getElementById('panel-peptidos');
+        const panelCursos = document.getElementById('panel-cursos');
+
+        if (tabNavPeptidos && tabNavCursos) {
+            tabNavPeptidos.addEventListener('click', () => {
+                tabNavPeptidos.classList.add('active');
+                tabNavPeptidos.setAttribute('aria-selected', 'true');
+                tabNavCursos.classList.remove('active');
+                tabNavCursos.setAttribute('aria-selected', 'false');
+
+                if (panelPeptidos) panelPeptidos.style.display = 'block';
+                if (panelCursos) panelCursos.style.display = 'none';
+            });
+
+            tabNavCursos.addEventListener('click', () => {
+                tabNavCursos.classList.add('active');
+                tabNavCursos.setAttribute('aria-selected', 'true');
+                tabNavPeptidos.classList.remove('active');
+                tabNavPeptidos.setAttribute('aria-selected', 'false');
+
+                if (panelCursos) panelCursos.style.display = 'block';
+                if (panelPeptidos) panelPeptidos.style.display = 'none';
+                cargarCursos();
+            });
+        }
+
+        const cursosSearchInput = document.getElementById('admin-cursos-search-input');
+        const cursosTypeFilter = document.getElementById('admin-cursos-type-filter');
+        if (cursosSearchInput) cursosSearchInput.addEventListener('input', aplicarFiltrosCursos);
+        if (cursosTypeFilter) cursosTypeFilter.addEventListener('change', aplicarFiltrosCursos);
+
+        const btnOpenCreateCursoModal = document.getElementById('btn-open-create-curso-modal');
+        const btnCloseCursoFormModal = document.getElementById('btn-close-curso-form-modal');
+        const btnCancelCursoForm = document.getElementById('btn-cancel-curso-form');
+        const btnSaveCurso = document.getElementById('btn-save-curso');
+
+        if (btnOpenCreateCursoModal) btnOpenCreateCursoModal.addEventListener('click', () => abrirModalCursoForm(null));
+        if (btnCloseCursoFormModal) btnCloseCursoFormModal.addEventListener('click', cerrarModalCursoForm);
+        if (btnCancelCursoForm) btnCancelCursoForm.addEventListener('click', cerrarModalCursoForm);
+        if (btnSaveCurso) btnSaveCurso.addEventListener('click', guardarCurso);
+
+        // Dropzone de Imagen de Cursos
+        const dropzoneCursoArea = document.getElementById('dropzone-curso-area');
+        const formCursoImagenFile = document.getElementById('form-curso-imagen-file');
+        const btnRemoveCursoPreview = document.getElementById('btn-remove-curso-preview');
+        const btnChangeCursoImage = document.getElementById('btn-change-curso-image');
+
+        if (dropzoneCursoArea && formCursoImagenFile) {
+            dropzoneCursoArea.addEventListener('click', (e) => {
+                if (!e.target.closest('#btn-remove-curso-preview') && !e.target.closest('#btn-change-curso-image')) {
+                    formCursoImagenFile.click();
+                }
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzoneCursoArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzoneCursoArea.style.borderColor = 'var(--secondary)';
+                    dropzoneCursoArea.style.backgroundColor = '#EBF5F0';
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzoneCursoArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzoneCursoArea.style.borderColor = '#006847';
+                    dropzoneCursoArea.style.backgroundColor = '#F4F9F6';
+                }, false);
+            });
+
+            dropzoneCursoArea.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                if (dt.files && dt.files.length > 0) {
+                    subirImagenCursoDesdeDispositivo({ target: { files: dt.files } });
+                }
+            });
+        }
+
+        if (formCursoImagenFile) {
+            formCursoImagenFile.addEventListener('change', subirImagenCursoDesdeDispositivo);
+        }
+
+        if (btnChangeCursoImage && formCursoImagenFile) {
+            btnChangeCursoImage.addEventListener('click', (e) => {
+                e.stopPropagation();
+                formCursoImagenFile.click();
+            });
+        }
+
+        if (btnRemoveCursoPreview) {
+            btnRemoveCursoPreview.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ocultarPreviewImagenCurso();
+            });
+        }
+
+        const btnCloseCursoViewModal = document.getElementById('btn-close-curso-view-modal');
+        const btnCloseCursoView = document.getElementById('btn-close-curso-view');
+        if (btnCloseCursoViewModal) btnCloseCursoViewModal.addEventListener('click', cerrarModalCursoView);
+        if (btnCloseCursoView) btnCloseCursoView.addEventListener('click', cerrarModalCursoView);
+
+        const btnCloseCursoDeleteModal = document.getElementById('btn-close-curso-delete-modal');
+        const btnCancelCursoDelete = document.getElementById('btn-cancel-curso-delete');
+        const btnConfirmCursoDelete = document.getElementById('btn-confirm-curso-delete');
+
+        if (btnCloseCursoDeleteModal) btnCloseCursoDeleteModal.addEventListener('click', cerrarModalCursoDelete);
+        if (btnCancelCursoDelete) btnCancelCursoDelete.addEventListener('click', cerrarModalCursoDelete);
+        if (btnConfirmCursoDelete) btnConfirmCursoDelete.addEventListener('click', confirmarEliminarCurso);
+
+        // Cerrar modales al hacer clic en el fondo oscuro exterior
+        [
+            modalFormOverlay, 
+            modalViewOverlay, 
+            modalDeleteOverlay,
+            document.getElementById('modal-curso-form-overlay'),
+            document.getElementById('modal-curso-view-overlay'),
+            document.getElementById('modal-curso-delete-overlay')
+        ].forEach(overlay => {
+            if (overlay) {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        cerrarModalFormulario();
+                        cerrarModalView();
+                        cerrarModalDelete();
+                        cerrarModalCursoForm();
+                        cerrarModalCursoView();
+                        cerrarModalCursoDelete();
+                    }
+                });
+            }
+        });
+
         // Cerrar modales con tecla Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 cerrarModalFormulario();
                 cerrarModalView();
                 cerrarModalDelete();
+                cerrarModalCursoForm();
+                cerrarModalCursoView();
+                cerrarModalCursoDelete();
             }
         });
+    }
+
+    // ====================================================================
+    // 11. Módulo CRUD de Cursos, Diplomados, Seminarios y Conferencias
+    // ====================================================================
+    let todosLosCursos = [];
+    let cursoSeleccionadoParaEliminar = null;
+
+    async function cargarCursos(silent = false) {
+        const cursosTableBody = document.getElementById('cursos-table-body');
+        if (!silent && cursosTableBody) {
+            cursosTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <div class="spinner" style="border-top-color: var(--secondary); width: 2rem; height: 2rem;"></div>
+                        <p style="margin-top: 1rem;">Actualizando programas académicos...</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        try {
+            const res = await authFetch('/api/admin/cursos');
+            if (res.ok) {
+                todosLosCursos = await res.json();
+                renderizarTablaCursos(todosLosCursos);
+            } else {
+                if (cursosTableBody) {
+                    cursosTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <p style="color: var(--danger);">No fue posible cargar los cursos.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        } catch (error) {
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error al conectar con el servidor para obtener los cursos.', 'danger');
+            }
+        }
+    }
+
+    function renderizarTablaCursos(cursos) {
+        const cursosTableBody = document.getElementById('cursos-table-body');
+        if (!cursosTableBody) return;
+
+        if (!cursos || cursos.length === 0) {
+            cursosTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <p>No se encontraron programas académicos registrados.</p>
+                        <button type="button" class="btn btn-secondary" style="margin-top: 0.75rem;" onclick="document.getElementById('btn-open-create-curso-modal').click()">
+                            + Registrar el primer programa
+                        </button>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        cursosTableBody.innerHTML = '';
+        cursos.forEach(curso => {
+            const tr = document.createElement('tr');
+            tr.id = `curso-row-${curso.id}`;
+            tr.setAttribute('data-id', curso.id);
+            tr.setAttribute('data-curso-id', curso.id);
+
+            let badgeTipoClass = 'badge-tipo-curso';
+            const t = (curso.tipo || '').toLowerCase();
+            if (t === 'seminario') badgeTipoClass = 'badge-tipo-seminario';
+            else if (t === 'conferencia' || t === 'simposio') badgeTipoClass = 'badge-tipo-conferencia';
+
+            tr.innerHTML = `
+                <td style="font-weight: 700; color: var(--text-muted); font-size: 0.82rem;">#${curso.id}</td>
+                <td>
+                    <img src="${escapeHtml(curso.imagenUrl || '/assets/images/curso-peptidos.jpg')}" 
+                         alt="${escapeHtml(curso.titulo)}" 
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" 
+                         onerror="this.src='/assets/images/curso-peptidos.jpg'">
+                </td>
+                <td>
+                    <div style="font-weight: 700; color: var(--primary); font-size: 0.95rem; line-height: 1.3; margin-bottom: 0.2rem;">
+                        ${escapeHtml(curso.titulo)}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${escapeHtml(curso.descripcion)}
+                    </div>
+                </td>
+                <td>
+                    <span class="badge-cat ${badgeTipoClass}">
+                        ${escapeHtml(curso.badgeTipo || curso.tipo)}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge-estado">
+                        ${escapeHtml(curso.estado || 'Activo')}
+                    </span>
+                </td>
+                <td style="font-size: 0.82rem; color: var(--text-muted);">
+                    <div><strong>${escapeHtml(curso.meta1 || '—')}</strong></div>
+                    <div style="font-size: 0.76rem;">${escapeHtml(curso.meta2 || '')}</div>
+                </td>
+                <td style="text-align: right;">
+                    <div class="action-buttons" style="justify-content: flex-end;">
+                        <button class="btn-action btn-view" data-curso-id="${curso.id}" title="Ver ficha">
+                            👁️ Ver
+                        </button>
+                        <button class="btn-action btn-edit" data-curso-id="${curso.id}" title="Editar">
+                            ✏️ Editar
+                        </button>
+                        <button class="btn-action btn-delete" data-curso-id="${curso.id}" title="Eliminar">
+                            🗑️
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            tr.querySelector('.btn-view').addEventListener('click', () => abrirModalVerCurso(curso.id));
+            tr.querySelector('.btn-edit').addEventListener('click', () => abrirModalCursoForm(curso));
+            tr.querySelector('.btn-delete').addEventListener('click', () => abrirModalEliminarCurso(curso));
+
+            cursosTableBody.appendChild(tr);
+        });
+    }
+
+    function resaltarFilaCurso(id) {
+        setTimeout(() => {
+            const tr = document.getElementById(`curso-row-${id}`) || document.querySelector(`tr[data-curso-id="${id}"]`);
+            if (tr) {
+                tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                tr.style.transition = 'background-color 0.4s ease';
+                tr.style.backgroundColor = 'rgba(0, 104, 71, 0.22)';
+                setTimeout(() => {
+                    tr.style.backgroundColor = '';
+                }, 2500);
+            }
+        }, 80);
+    }
+
+    function aplicarFiltrosCursos() {
+        const cursosSearchInput = document.getElementById('admin-cursos-search-input');
+        const cursosTypeFilter = document.getElementById('admin-cursos-type-filter');
+
+        const busqueda = (cursosSearchInput ? cursosSearchInput.value : '').toLowerCase().trim();
+        const tipoFiltro = (cursosTypeFilter ? cursosTypeFilter.value : '').toLowerCase().trim();
+
+        const filtrados = todosLosCursos.filter(c => {
+            const coincideTipo = !tipoFiltro || 
+                                 (c.tipo && (c.tipo.toLowerCase() === tipoFiltro || (tipoFiltro === 'curso' && c.tipo.toLowerCase() === 'diplomado')));
+            const coincideBusqueda = !busqueda || 
+                                     (c.titulo && c.titulo.toLowerCase().includes(busqueda)) ||
+                                     (c.descripcion && c.descripcion.toLowerCase().includes(busqueda)) ||
+                                     (c.meta1 && c.meta1.toLowerCase().includes(busqueda)) ||
+                                     (c.badgeTipo && c.badgeTipo.toLowerCase().includes(busqueda));
+
+            return coincideTipo && coincideBusqueda;
+        });
+
+        renderizarTablaCursos(filtrados);
+    }
+
+    function abrirModalCursoForm(curso = null) {
+        const modal = document.getElementById('modal-curso-form-overlay');
+        const modalTitle = document.getElementById('curso-form-modal-title');
+        const form = document.getElementById('curso-form');
+        if (!modal || !form) return;
+
+        form.reset();
+        document.querySelectorAll('.field-error').forEach(e => e.style.display = 'none');
+
+        const formId = document.getElementById('form-curso-id');
+        const formTitulo = document.getElementById('form-curso-titulo');
+        const formTipo = document.getElementById('form-curso-tipo');
+        const formBadge = document.getElementById('form-curso-badge');
+        const formEstado = document.getElementById('form-curso-estado');
+        const formMeta1 = document.getElementById('form-curso-meta1');
+        const formMeta2 = document.getElementById('form-curso-meta2');
+        const formDescripcion = document.getElementById('form-curso-descripcion');
+        const formAcreditacion = document.getElementById('form-curso-acreditacion');
+        const formWhatsapp = document.getElementById('form-curso-whatsapp');
+        const formBtnText = document.getElementById('form-curso-btn-text');
+        const formImagen = document.getElementById('form-curso-imagen');
+
+        if (curso) {
+            modalTitle.textContent = `Editar programa: ${curso.titulo}`;
+            formId.value = curso.id;
+            formTitulo.value = curso.titulo || '';
+            formTipo.value = (curso.tipo || 'curso').toLowerCase();
+            formBadge.value = curso.badgeTipo || '';
+            formEstado.value = curso.estado || '';
+            formMeta1.value = curso.meta1 || '';
+            formMeta2.value = curso.meta2 || '';
+            formDescripcion.value = curso.descripcion || '';
+            formAcreditacion.value = curso.acreditacion || '';
+            formWhatsapp.value = curso.enlaceWhatsapp || '';
+            formBtnText.value = curso.textoBoton || 'Solicitar Programa e Inscripción';
+            formImagen.value = curso.imagenUrl || '';
+
+            if (curso.imagenUrl) {
+                mostrarPreviewImagenCurso(curso.imagenUrl, 'Imagen vinculada');
+            } else {
+                ocultarPreviewImagenCurso();
+            }
+        } else {
+            modalTitle.textContent = 'Agregar nuevo programa académico';
+            formId.value = '';
+            formTipo.value = 'curso';
+            formBadge.value = 'Curso con Constancia';
+            formEstado.value = 'Inscripciones Abiertas';
+            formBtnText.value = 'Solicitar Programa e Inscripción';
+            formWhatsapp.value = 'https://wa.me/525579247494';
+            formImagen.value = '/assets/images/curso-peptidos.jpg';
+            ocultarPreviewImagenCurso();
+        }
+
+        modal.classList.add('active');
+        if (formTitulo) formTitulo.focus();
+    }
+
+    function cerrarModalCursoForm() {
+        const modal = document.getElementById('modal-curso-form-overlay');
+        if (modal) modal.classList.remove('active');
+        ocultarPreviewImagenCurso();
+    }
+
+    async function guardarCurso() {
+        const formId = document.getElementById('form-curso-id');
+        const formTitulo = document.getElementById('form-curso-titulo');
+        const formTipo = document.getElementById('form-curso-tipo');
+        const formBadge = document.getElementById('form-curso-badge');
+        const formEstado = document.getElementById('form-curso-estado');
+        const formMeta1 = document.getElementById('form-curso-meta1');
+        const formMeta2 = document.getElementById('form-curso-meta2');
+        const formDescripcion = document.getElementById('form-curso-descripcion');
+        const formAcreditacion = document.getElementById('form-curso-acreditacion');
+        const formWhatsapp = document.getElementById('form-curso-whatsapp');
+        const formBtnText = document.getElementById('form-curso-btn-text');
+        const formImagen = document.getElementById('form-curso-imagen');
+
+        let valido = true;
+
+        if (!formTitulo.value.trim()) {
+            document.getElementById('err-curso-titulo').style.display = 'block';
+            valido = false;
+        } else {
+            document.getElementById('err-curso-titulo').style.display = 'none';
+        }
+
+        if (!formBadge.value.trim()) {
+            document.getElementById('err-curso-badge').style.display = 'block';
+            valido = false;
+        } else {
+            document.getElementById('err-curso-badge').style.display = 'none';
+        }
+
+        if (!formEstado.value.trim()) {
+            document.getElementById('err-curso-estado').style.display = 'block';
+            valido = false;
+        } else {
+            document.getElementById('err-curso-estado').style.display = 'none';
+        }
+
+        if (!formDescripcion.value.trim()) {
+            document.getElementById('err-curso-descripcion').style.display = 'block';
+            valido = false;
+        } else {
+            document.getElementById('err-curso-descripcion').style.display = 'none';
+        }
+
+        if (!valido) {
+            mostrarToast('Por favor completa todos los campos obligatorios del programa.', 'danger');
+            return;
+        }
+
+        const payload = {
+            titulo: formTitulo.value.trim(),
+            tipo: formTipo.value.trim(),
+            badgeTipo: formBadge.value.trim(),
+            estado: formEstado.value.trim(),
+            meta1: formMeta1.value.trim(),
+            meta2: formMeta2.value.trim(),
+            descripcion: formDescripcion.value.trim(),
+            acreditacion: formAcreditacion.value.trim(),
+            enlaceWhatsapp: formWhatsapp.value.trim() || 'https://wa.me/525579247494',
+            textoBoton: formBtnText.value.trim() || 'Solicitar Programa e Inscripción',
+            imagenUrl: formImagen.value.trim() || '/assets/images/curso-peptidos.jpg',
+            orden: 1,
+            activo: true
+        };
+
+        const id = formId.value;
+        const esEdicion = !!id;
+        const url = esEdicion ? `/api/admin/cursos/${id}` : '/api/admin/cursos';
+        const method = esEdicion ? 'PUT' : 'POST';
+
+        const saveBtnText = document.getElementById('save-curso-btn-text');
+        const saveBtnSpinner = document.getElementById('save-curso-btn-spinner');
+        const btnSaveCurso = document.getElementById('btn-save-curso');
+
+        if (saveBtnText) saveBtnText.textContent = esEdicion ? 'Actualizando...' : 'Guardando...';
+        if (saveBtnSpinner) saveBtnSpinner.style.display = 'inline-block';
+        if (btnSaveCurso) btnSaveCurso.disabled = true;
+
+        try {
+            const res = await authFetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok) {
+                cerrarModalCursoForm();
+                mostrarToast(esEdicion ? 'Programa actualizado exitosamente.' : 'Programa registrado exitosamente.', 'success');
+
+                // INSERCIÓN / ACTUALIZACIÓN INMEDIATA EN MEMORIA Y RENDERIZADO AL INSTANTE
+                if (esEdicion) {
+                    const idx = todosLosCursos.findIndex(c => c.id == data.id);
+                    if (idx !== -1) {
+                        todosLosCursos[idx] = data;
+                    }
+                } else {
+                    todosLosCursos.unshift(data);
+                }
+
+                // Limpiar filtros activos para mostrar el nuevo curso inmediatamente
+                const cursosSearchInput = document.getElementById('admin-cursos-search-input');
+                const cursosTypeFilter = document.getElementById('admin-cursos-type-filter');
+                if (cursosSearchInput) cursosSearchInput.value = '';
+                if (cursosTypeFilter) cursosTypeFilter.value = '';
+
+                renderizarTablaCursos(todosLosCursos);
+                resaltarFilaCurso(data.id || id);
+
+                // Cargar estadísticas actualizadas
+                cargarEstadisticas();
+
+                // Notificar en tiempo real al portal público y otras pestañas
+                notificarSincronizacionCursos(esEdicion ? 'UPDATE' : 'CREATE', data.id || id);
+
+                // Sincronizar silenciosamente con el servidor
+                cargarCursos(true);
+            } else {
+                const errorMsg = data.mensaje || data.message || data.error || 'Error al guardar el programa.';
+                mostrarToast(errorMsg, 'danger');
+            }
+        } catch (error) {
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error de conexión con el servidor al guardar el programa: ' + (error.message || ''), 'danger');
+            }
+        } finally {
+            if (saveBtnText) saveBtnText.textContent = 'Guardar programa';
+            if (saveBtnSpinner) saveBtnSpinner.style.display = 'none';
+            if (btnSaveCurso) btnSaveCurso.disabled = false;
+        }
+    }
+
+    function abrirModalVerCurso(id) {
+        const curso = todosLosCursos.find(c => c.id == id);
+        if (!curso) return;
+
+        const modal = document.getElementById('modal-curso-view-overlay');
+        const body = document.getElementById('curso-view-modal-body');
+        if (!modal || !body) return;
+
+        body.innerHTML = `
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <img src="${escapeHtml(curso.imagenUrl || '/assets/images/curso-peptidos.jpg')}" 
+                     alt="${escapeHtml(curso.titulo)}" 
+                     style="width: 160px; height: 160px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-color);"
+                     onerror="this.src='/assets/images/curso-peptidos.jpg'">
+                <div style="flex: 1; min-width: 250px;">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+                        <span class="badge-cat badge-tipo-${(curso.tipo || 'curso').toLowerCase()}">${escapeHtml(curso.badgeTipo || curso.tipo)}</span>
+                        <span class="badge-estado">${escapeHtml(curso.estado)}</span>
+                    </div>
+                    <h2 style="font-size: 1.35rem; color: var(--primary); margin-bottom: 0.5rem; line-height: 1.3;">${escapeHtml(curso.titulo)}</h2>
+                    <p style="font-size: 0.88rem; color: var(--secondary); font-weight: 600;">
+                        ⏱️ ${escapeHtml(curso.meta1 || '')} &nbsp;|&nbsp; 💻 ${escapeHtml(curso.meta2 || '')}
+                    </p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 0.35rem;">Descripción Científica</h4>
+                <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text-dark);">${escapeHtml(curso.descripcion)}</p>
+            </div>
+
+            ${curso.acreditacion ? `
+                <div style="background-color: #FAF5E8; border: 1px solid #DFC89A; border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.25rem;">
+                    <h4 style="font-size: 0.9rem; color: #7A5711; margin-bottom: 0.25rem;">✓ Acreditación Oficial SOMEP</h4>
+                    <p style="font-size: 0.88rem; color: #4A3B18; line-height: 1.5;">${escapeHtml(curso.acreditacion)}</p>
+                </div>
+            ` : ''}
+
+            <div style="background-color: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem 1rem;">
+                <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+                    <strong>Enlace a WhatsApp configurado:</strong>
+                </p>
+                <a href="${escapeHtml(curso.enlaceWhatsapp || 'https://wa.me/525579247494')}" target="_blank" rel="noopener noreferrer" style="font-size: 0.84rem; color: var(--secondary); word-break: break-all;">
+                    ${escapeHtml(curso.enlaceWhatsapp || 'https://wa.me/525579247494')}
+                </a>
+            </div>
+        `;
+
+        modal.classList.add('active');
+    }
+
+    function cerrarModalCursoView() {
+        const modal = document.getElementById('modal-curso-view-overlay');
+        if (modal) modal.classList.remove('active');
+    }
+
+    function abrirModalEliminarCurso(curso) {
+        cursoSeleccionadoParaEliminar = curso;
+        const modal = document.getElementById('modal-curso-delete-overlay');
+        const nameEl = document.getElementById('delete-curso-name');
+        const idEl = document.getElementById('delete-curso-id');
+        if (!modal) return;
+
+        if (nameEl) nameEl.textContent = curso.titulo;
+        if (idEl) idEl.textContent = curso.id;
+
+        modal.classList.add('active');
+    }
+
+    function cerrarModalCursoDelete() {
+        const modal = document.getElementById('modal-curso-delete-overlay');
+        if (modal) modal.classList.remove('active');
+        cursoSeleccionadoParaEliminar = null;
+    }
+
+    async function confirmarEliminarCurso() {
+        if (!cursoSeleccionadoParaEliminar) return;
+
+        const idAEliminar = cursoSeleccionadoParaEliminar.id;
+        const btnConfirm = document.getElementById('btn-confirm-curso-delete');
+        const delBtnSpinner = document.getElementById('del-curso-btn-spinner');
+        const delBtnText = document.getElementById('del-curso-btn-text');
+
+        if (btnConfirm) btnConfirm.disabled = true;
+        if (delBtnSpinner) delBtnSpinner.style.display = 'inline-block';
+        if (delBtnText) delBtnText.textContent = 'Eliminando...';
+
+        try {
+            const res = await authFetch(`/api/admin/cursos/${idAEliminar}`, {
+                method: 'DELETE',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (res.ok) {
+                cerrarModalCursoDelete();
+                mostrarToast('Programa académico eliminado exitosamente.', 'success');
+
+                // 1. Animación visual y eliminación inmediata de la fila en el DOM
+                const fila = document.getElementById(`curso-row-${idAEliminar}`) || document.querySelector(`tr[data-curso-id="${idAEliminar}"]`);
+                if (fila) {
+                    fila.style.transition = 'all 0.35s ease';
+                    fila.style.opacity = '0';
+                    fila.style.transform = 'translateX(35px)';
+                    setTimeout(() => {
+                        if (fila.parentNode) fila.remove();
+                        if (todosLosCursos.length === 0) {
+                            renderizarTablaCursos([]);
+                        }
+                    }, 300);
+                }
+
+                // 2. Eliminación inmediata de la lista en memoria
+                todosLosCursos = todosLosCursos.filter(c => c.id != idAEliminar);
+
+                // 3. Re-aplicar filtros vigentes para sincronizar la vista al instante
+                aplicarFiltrosCursos();
+
+                // 4. Actualizar contadores del panel
+                cargarEstadisticas();
+
+                // 5. Notificar en tiempo real al portal público y otras pestañas
+                notificarSincronizacionCursos('DELETE', idAEliminar);
+            } else {
+                const data = await res.json().catch(() => ({}));
+                const errorMsg = data.mensaje || data.message || data.error || 'Error al eliminar el programa.';
+                mostrarToast(errorMsg, 'danger');
+            }
+        } catch (error) {
+            if (error.message !== 'Sesión no autorizada o expirada') {
+                mostrarToast('Error de conexión con el servidor al eliminar.', 'danger');
+            }
+        } finally {
+            if (btnConfirm) btnConfirm.disabled = false;
+            if (delBtnSpinner) delBtnSpinner.style.display = 'none';
+            if (delBtnText) delBtnText.textContent = 'Eliminar definitivamente';
+        }
+    }
+
+    async function subirImagenCursoDesdeDispositivo(e) {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const file = files[0];
+        if (!file.type.startsWith('image/')) {
+            mostrarToast('Por favor selecciona un archivo de imagen válido (JPG, PNG, WEBP).', 'danger');
+            return;
+        }
+
+        const uploadStatus = document.getElementById('upload-curso-status');
+        const emptyState = document.getElementById('dropzone-curso-empty-state');
+        const previewContainer = document.getElementById('image-curso-preview-container');
+
+        if (uploadStatus) uploadStatus.style.display = 'flex';
+        if (emptyState) emptyState.style.display = 'none';
+        if (previewContainer) previewContainer.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            await obtenerCsrfToken();
+            const headers = { 'Accept': 'application/json' };
+            if (csrfTokenCached) headers['X-XSRF-TOKEN'] = csrfTokenCached;
+
+            const res = await fetch('/api/admin/peptidos/upload-imagen', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: headers,
+                body: formData
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('form-curso-imagen').value = data.url;
+                mostrarPreviewImagenCurso(data.url, data.nombre || file.name);
+                mostrarToast('Imagen del programa subida correctamente.');
+            } else {
+                const errorData = await res.json();
+                mostrarToast(errorData.mensaje || 'Error al subir la imagen.', 'danger');
+                ocultarPreviewImagenCurso();
+            }
+        } catch (err) {
+            mostrarToast('Error de red al subir la imagen.', 'danger');
+            ocultarPreviewImagenCurso();
+        } finally {
+            if (uploadStatus) uploadStatus.style.display = 'none';
+        }
+    }
+
+    function mostrarPreviewImagenCurso(url, nombre = 'curso.jpg') {
+        const emptyState = document.getElementById('dropzone-curso-empty-state');
+        const previewContainer = document.getElementById('image-curso-preview-container');
+        const previewImg = document.getElementById('image-curso-preview-img');
+        const previewName = document.getElementById('image-curso-preview-name');
+
+        if (emptyState) emptyState.style.display = 'none';
+        if (previewContainer) previewContainer.style.display = 'flex';
+        if (previewImg) previewImg.src = url;
+        if (previewName) previewName.textContent = nombre;
+    }
+
+    function ocultarPreviewImagenCurso() {
+        const emptyState = document.getElementById('dropzone-curso-empty-state');
+        const previewContainer = document.getElementById('image-curso-preview-container');
+        const formCursoImagen = document.getElementById('form-curso-imagen');
+        const formCursoImagenFile = document.getElementById('form-curso-imagen-file');
+
+        if (emptyState) emptyState.style.display = 'block';
+        if (previewContainer) previewContainer.style.display = 'none';
+        if (formCursoImagen) formCursoImagen.value = '';
+        if (formCursoImagenFile) formCursoImagenFile.value = '';
     }
 
     function escapeHtml(text) {

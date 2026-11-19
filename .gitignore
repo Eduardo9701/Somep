@@ -34,3 +34,9 @@ uploads/*
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Documentation & Generators (Dossier & Manual)
+dossier/
+dossier-generator/
+manual/
+

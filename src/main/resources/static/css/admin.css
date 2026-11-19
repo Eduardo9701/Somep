@@ -406,6 +406,74 @@ body {
 }
 
 /* ====================================================================
+   PESTAÑAS DE NAVEGACIÓN DE MÓDULOS CRUD
+   ==================================================================== */
+.admin-modules-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.25rem;
+}
+
+.admin-tab-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.35rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.admin-tab-nav-btn:hover {
+    color: var(--primary);
+    background-color: #F8FAFC;
+}
+
+.admin-tab-nav-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background-color: rgba(74, 21, 75, 0.05);
+    font-weight: 700;
+}
+
+.tab-icon {
+    font-size: 1.15rem;
+}
+
+.badge-tipo-curso {
+    background-color: rgba(74, 21, 75, 0.1);
+    color: var(--primary);
+}
+
+.badge-tipo-seminario {
+    background-color: rgba(0, 104, 71, 0.1);
+    color: var(--secondary);
+}
+
+.badge-tipo-conferencia {
+    background-color: rgba(197, 160, 89, 0.15);
+    color: #7A5711;
+}
+
+.badge-estado {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 700;
+    background-color: #F1F5F9;
+    color: #334155;
+}
+
+/* ====================================================================
    SECCIÓN DE TABLA Y FILTROS
    ==================================================================== */
 .table-panel {

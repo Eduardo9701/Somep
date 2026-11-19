@@ -81,10 +81,32 @@
           <div class="stat-value" id="stat-ultima-act" style="font-size: 1.15rem; margin-top: 0.5rem;">—</div>
         </div>
       </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-purple" style="background: rgba(0, 104, 71, 0.1); color: #006847;">
+          🎓
+        </div>
+        <div class="stat-details">
+          <h3>Cursos & Eventos</h3>
+          <div class="stat-value" id="stat-total-cursos">—</div>
+        </div>
+      </div>
     </section>
 
-    <!-- Panel de Tabla y Operaciones -->
-    <section class="table-panel">
+    <!-- Selector de Módulos CRUD -->
+    <div class="admin-modules-tabs" role="tablist" aria-label="Módulos de administración">
+      <button type="button" class="admin-tab-nav-btn active" id="tab-nav-peptidos" role="tab" aria-selected="true" aria-controls="panel-peptidos">
+        <span class="tab-icon">🧪</span>
+        <span>Péptidos y Moléculas</span>
+      </button>
+      <button type="button" class="admin-tab-nav-btn" id="tab-nav-cursos" role="tab" aria-selected="false" aria-controls="panel-cursos">
+        <span class="tab-icon">🎓</span>
+        <span>Cursos, Diplomados y Eventos</span>
+      </button>
+    </div>
+
+    <!-- Panel de Tabla y Operaciones: Péptidos -->
+    <section class="table-panel" id="panel-peptidos">
       <div class="panel-header">
         <h2 class="panel-title">Gestión de Péptidos y Moléculas</h2>
 
@@ -128,6 +150,62 @@
               <td colspan="6" class="empty-state">
                 <div class="spinner" style="border-top-color: var(--primary); width: 2rem; height: 2rem;"></div>
                 <p style="margin-top: 1rem;">Cargando catálogo administrativo...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Panel CRUD: Cursos, Diplomados, Seminarios y Conferencias -->
+    <section class="table-panel" id="panel-cursos" style="display: none;">
+      <div class="panel-header">
+        <h2 class="panel-title">Gestión de Cursos, Diplomados, Seminarios y Conferencias</h2>
+
+        <div class="panel-controls">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input 
+              type="text" 
+              id="admin-cursos-search-input" 
+              class="search-input" 
+              placeholder="Buscar programa por título o descripción...">
+          </div>
+
+          <select id="admin-cursos-type-filter" class="category-filter" aria-label="Filtrar por tipo de programa">
+            <option value="">Todos los tipos</option>
+            <option value="curso">Cursos & Diplomados</option>
+            <option value="seminario">Seminarios Clínicos</option>
+            <option value="conferencia">Conferencias & Simposios</option>
+          </select>
+
+          <button id="btn-open-create-curso-modal" class="btn btn-primary" style="background-color: var(--secondary);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            <span>Agregar nuevo programa</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table" id="admin-cursos-table">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 50px;">ID</th>
+              <th scope="col" style="width: 75px;">Imagen</th>
+              <th scope="col">Título del Programa</th>
+              <th scope="col">Clasificación</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Modalidad / Horas</th>
+              <th scope="col" style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cursos-table-body">
+            <tr>
+              <td colspan="7" class="empty-state">
+                <div class="spinner" style="border-top-color: var(--secondary); width: 2rem; height: 2rem;"></div>
+                <p style="margin-top: 1rem;">Cargando programas académicos...</p>
               </td>
             </tr>
           </tbody>
@@ -295,9 +373,183 @@
     </div>
   </div>
 
+  <!-- Modal: Crear / Editar Programa Académico -->
+  <div class="modal-overlay" id="modal-curso-form-overlay" role="dialog" aria-modal="true" aria-labelledby="curso-form-modal-title">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 class="modal-title" id="curso-form-modal-title">Agregar nuevo programa académico</h3>
+        <button class="modal-close" id="btn-close-curso-form-modal" aria-label="Cerrar">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <form id="curso-form" novalidate>
+          <input type="hidden" id="form-curso-id" value="">
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="form-curso-titulo" class="form-label">Título del Programa *</label>
+              <input type="text" id="form-curso-titulo" class="form-input" required maxlength="250" placeholder="ej. Diplomado Internacional en Terapéutica Peptídica">
+              <div class="field-error" id="err-curso-titulo">El título es obligatorio.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="form-curso-tipo" class="form-label">Tipo de Programa *</label>
+              <select id="form-curso-tipo" class="form-input" required>
+                <option value="curso">Curso / Diplomado</option>
+                <option value="seminario">Seminario Clínico</option>
+                <option value="conferencia">Conferencia / Simposio</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="form-curso-badge" class="form-label">Etiqueta Visual (Badge Superior) *</label>
+              <input type="text" id="form-curso-badge" class="form-input" required maxlength="100" placeholder="ej. Curso con Constancia, Seminario Clínico">
+              <div class="field-error" id="err-curso-badge">La etiqueta es obligatoria.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="form-curso-estado" class="form-label">Estado de Convocatoria *</label>
+              <input type="text" id="form-curso-estado" class="form-input" required maxlength="80" placeholder="ej. Inscripciones Abiertas, Próxima Edición">
+              <div class="field-error" id="err-curso-estado">El estado es obligatorio.</div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="form-curso-meta1" class="form-label">Duración / Horas (Metadato 1)</label>
+              <input type="text" id="form-curso-meta1" class="form-input" maxlength="150" placeholder="ej. 60 Horas Académicas o 16 Horas Teórico-Prácticas">
+            </div>
+
+            <div class="form-group">
+              <label for="form-curso-meta2" class="form-label">Modalidad / Formato (Metadato 2)</label>
+              <input type="text" id="form-curso-meta2" class="form-input" maxlength="150" placeholder="ej. Modalidad Online Asíncrona o Sesiones en Vivo">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-curso-descripcion" class="form-label">Descripción del Programa *</label>
+            <textarea id="form-curso-descripcion" class="form-textarea" rows="3" required placeholder="Temario, fundamentación científica, objetivos y alcance del programa..."></textarea>
+            <div class="field-error" id="err-curso-descripcion">La descripción es obligatoria.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-curso-acreditacion" class="form-label">Acreditación y Constancia SOMEP</label>
+            <textarea id="form-curso-acreditacion" class="form-textarea" rows="2" placeholder="ej. Constancia institucional con folio único, desglose curricular y código QR..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="form-curso-whatsapp" class="form-label">Enlace a WhatsApp (con mensaje personalizado)</label>
+              <input type="text" id="form-curso-whatsapp" class="form-input" maxlength="500" placeholder="https://wa.me/525579247494?text=...">
+            </div>
+
+            <div class="form-group">
+              <label for="form-curso-btn-text" class="form-label">Texto del Botón de Contacto</label>
+              <input type="text" id="form-curso-btn-text" class="form-input" maxlength="100" placeholder="ej. Solicitar Programa e Inscripción">
+            </div>
+          </div>
+
+          <!-- Selector de Imagen para el Programa -->
+          <div class="form-group" style="margin-top: 1.25rem;">
+            <label class="form-label">Fotografía o afiche representativo</label>
+            <input type="hidden" id="form-curso-imagen" value="">
+
+            <div id="dropzone-curso-area" style="border: 2px dashed #006847; border-radius: var(--radius-md); padding: 1.5rem; text-align: center; background-color: #F4F9F6; cursor: pointer; transition: var(--transition);">
+              <input type="file" id="form-curso-imagen-file" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;">
+              
+              <div id="dropzone-curso-empty-state">
+                <div style="font-size: 2.25rem; margin-bottom: 0.5rem;" aria-hidden="true">🖼️</div>
+                <p style="font-weight: 600; color: var(--secondary); margin-bottom: 0.35rem; font-size: 0.95rem;">
+                  Toca o haz clic aquí para subir una imagen del programa
+                </p>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                  Formatos compatibles: JPG, PNG, WEBP (máx. 15 MB)
+                </p>
+              </div>
+
+              <!-- Indicador de subida -->
+              <div id="upload-curso-status" style="display: none; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem;">
+                <span class="spinner" style="border-top-color: var(--secondary); width: 1.25rem; height: 1.25rem;"></span>
+                <span style="font-weight: 600; color: var(--secondary); font-size: 0.9rem;">Subiendo imagen del programa...</span>
+              </div>
+
+              <!-- Vista previa -->
+              <div id="image-curso-preview-container" style="display: none; align-items: center; justify-content: space-between; gap: 1rem; text-align: left; background: #FFFFFF; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-top: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; overflow: hidden;">
+                  <img id="image-curso-preview-img" src="" alt="Vista previa del curso" style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); flex-shrink: 0;">
+                  <div style="overflow: hidden;">
+                    <p id="image-curso-preview-name" style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">curso.jpg</p>
+                    <p style="font-size: 0.78rem; color: var(--secondary); font-weight: 600;">✓ Imagen vinculada correctamente</p>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                  <button type="button" id="btn-change-curso-image" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Cambiar</button>
+                  <button type="button" id="btn-remove-curso-preview" class="btn btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Quitar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-curso-form">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-save-curso" style="background-color: var(--secondary);">
+          <span id="save-curso-btn-text">Guardar programa</span>
+          <span id="save-curso-btn-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Ver Detalle del Programa -->
+  <div class="modal-overlay" id="modal-curso-view-overlay" role="dialog" aria-modal="true" aria-labelledby="curso-view-modal-title">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 class="modal-title" id="curso-view-modal-title">Ficha Informativa del Programa</h3>
+        <button class="modal-close" id="btn-close-curso-view-modal" aria-label="Cerrar">&times;</button>
+      </header>
+
+      <div class="modal-body" id="curso-view-modal-body">
+        <!-- Contenido inyectado dinámicamente -->
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-curso-view">Cerrar</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar Eliminación del Programa -->
+  <div class="modal-overlay" id="modal-curso-delete-overlay" role="dialog" aria-modal="true" aria-labelledby="curso-delete-modal-title">
+    <div class="modal-card" style="max-width: 480px;">
+      <header class="modal-header">
+        <h3 class="modal-title" id="curso-delete-modal-title" style="color: var(--danger);">Confirmar Eliminación del Programa</h3>
+        <button class="modal-close" id="btn-close-curso-delete-modal" aria-label="Cerrar">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <p style="margin-bottom: 1rem;">¿Estás seguro de que deseas eliminar permanentemente el programa <strong id="delete-curso-name"></strong> (ID: <span id="delete-curso-id"></span>)?</p>
+        <div class="alert alert-danger" style="display: block;">
+          ⚠️ Esta acción eliminará el curso de la base de datos MySQL y dejará de mostrarse inmediatamente en la sección pública de cursos.
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-curso-delete">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-curso-delete">
+          <span id="del-curso-btn-text">Eliminar definitivamente</span>
+          <span id="del-curso-btn-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
   <!-- Contenedor Toast para Notificaciones -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-  <script src="/js/admin.js?v=1.0.3"></script>
+  <script src="/js/admin.js?v=1.0.7"></script>
 </body>
 </html>

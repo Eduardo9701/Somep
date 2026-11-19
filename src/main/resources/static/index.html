@@ -53,7 +53,8 @@
       <nav class="main-nav" aria-label="Navegación principal del sitio">
         <ul class="nav-menu">
           <li><a href="#catalogo" class="nav-link active">Catálogo Científico</a></li>
-          <li><a href="#academia" class="nav-link">Academia & Cursos</a></li>
+          <li><a href="#academia" class="nav-link">Cursos</a></li>
+          <li><a href="#membresias" class="nav-link">Membresías</a></li>
           <li><a href="#contacto" class="nav-link">Contacto</a></li>
         </ul>
       </nav>
@@ -219,135 +220,12 @@
         <button type="button" class="academy-filter-btn" data-filter="conferencia">Conferencias & Simposios</button>
       </div>
 
-      <!-- Cuadrícula de Programas Académicos -->
+      <!-- Cuadrícula Dinámica de Programas Académicos (Cargados desde la Base de Datos) -->
       <div class="academy-grid" id="academy-grid">
-        
-        <!-- Programa 1: Diplomado Internacional -->
-        <article class="academy-card" data-category="curso">
-          <div class="academy-card-media">
-            <img src="assets/images/curso-peptidos.jpg" alt="Médico en laboratorio evaluando datos de péptidos" class="academy-card-img" loading="lazy">
-            <div class="academy-card-overlay">
-              <span class="badge-type badge-course">Curso con Constancia</span>
-              <span class="badge-status">Inscripciones Abiertas</span>
-            </div>
-          </div>
-          <div class="academy-card-content">
-            <div class="academy-meta-row">
-              <span class="meta-item">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                60 Horas Académicas
-              </span>
-              <span class="meta-item">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
-                Modalidad Online Asíncrona + Tutoría
-              </span>
-            </div>
-            <h3 class="academy-card-title">
-              Diplomado Internacional en Terapéutica Peptídica y Bioquímica Celular
-            </h3>
-            <p class="academy-card-desc">
-              Formación exhaustiva sobre la bioquímica y farmacocinética de péptidos bioactivos, receptores hormonales acoplados a proteínas G, cascadas de señalización y análisis crítico de la literatura preclínica y clínica internacional.
-            </p>
-            <div class="academy-highlight-box">
-              <div class="highlight-mini-header">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                <span>Acreditación SOMEP</span>
-              </div>
-              <p class="highlight-mini-text">Constancia con folio de registro institucional único, desglose curricular de horas crédito y verificación digital QR.</p>
-            </div>
-            <div class="academy-card-actions">
-              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20sobre%20el%20Diplomado%20Internacional%20en%20Terap%C3%A9utica%20Pept%C3%ADdica" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
-                <span>Solicitar Programa e Inscripción</span>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Programa 2: Seminario Clínico -->
-        <article class="academy-card" data-category="seminario">
-          <div class="academy-card-media">
-            <img src="assets/images/seminario-metabolico.jpg" alt="Especialistas médicos en discusión de casos clínicos" class="academy-card-img" loading="lazy">
-            <div class="academy-card-overlay">
-              <span class="badge-type badge-seminar">Seminario Clínico</span>
-              <span class="badge-status">Próxima Edición</span>
-            </div>
-          </div>
-          <div class="academy-card-content">
-            <div class="academy-meta-row">
-              <span class="meta-item">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                16 Horas Teórico-Prácticas
-              </span>
-              <span class="meta-item">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/></svg>
-                Sesiones en Vivo con Expertos
-              </span>
-            </div>
-            <h3 class="academy-card-title">
-              Seminario Avanzado: Agonistas GLP-1 / GIP / Glucagón y Nuevas Moléculas Metabólicas
-            </h3>
-            <p class="academy-card-desc">
-              Actualización profunda sobre tirzepatida, retatrutide e incretinas sintéticas. Revisión de mecanismos fisiopatológicos, perfiles de seguridad, manejo de reacciones adversas y marco regulatorio vigente ante COFEPRIS y FDA.
-            </p>
-            <div class="academy-highlight-box">
-              <div class="highlight-mini-header">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                <span>Acreditación SOMEP</span>
-              </div>
-              <p class="highlight-mini-text">Constancia institucional de actualización médica continua con evaluación de casos y constancia foliada.</p>
-            </div>
-            <div class="academy-card-actions">
-              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20sobre%20el%20Seminario%20de%20Agonistas%20GLP-1%20y%20GIP" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
-                <span>Solicitar Programa e Inscripción</span>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Programa 3: Conferencia & Simposio -->
-        <article class="academy-card" data-category="conferencia">
-          <div class="academy-card-media">
-            <img src="assets/images/conferencia-anual.jpg" alt="Auditorio de conferencias médicas magistrales" class="academy-card-img" loading="lazy">
-            <div class="academy-card-overlay">
-              <span class="badge-type badge-conference">Simposio Nacional</span>
-              <span class="badge-status">Convocatoria 2026</span>
-            </div>
-          </div>
-          <div class="academy-card-content">
-            <div class="academy-meta-row">
-              <span class="meta-item">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                Híbrido: CDMX & Streaming
-              </span>
-              <span class="meta-item">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                Mesas de Diálogo y Vinculación
-              </span>
-            </div>
-            <h3 class="academy-card-title">
-              I Simposio Nacional SOMEP: Fronteras Científicas en Péptidos y Medicina de Precisión
-            </h3>
-            <p class="academy-card-desc">
-              El evento magno de vinculación científica. Conferencias magistrales con investigadores y docentes sobre neuroprotección (Semax, Cerebrolysin), equilibrio redox (Glutatión, NAD) y el futuro del portafolio documentado en México.
-            </p>
-            <div class="academy-highlight-box">
-              <div class="highlight-mini-header">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="#C5A059"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                <span>Acreditación SOMEP</span>
-              </div>
-              <p class="highlight-mini-text">Constancia oficial de asistencia institucional con código QR y valor curricular para miembros de la sociedad.</p>
-            </div>
-            <div class="academy-card-actions">
-              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20solicito%20informaci%C3%B3n%20para%20asistir%20al%20I%20Simposio%20Nacional%20SOMEP" target="_blank" rel="noopener noreferrer" class="btn-academy-primary">
-                <span>Reservar Lugar / Información</span>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
+        <div class="academy-loading-state" id="academy-loading-state" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;">
+          <div class="spinner" style="display: inline-block; width: 2.25rem; height: 2.25rem; border: 3px solid #E5E7EB; border-top-color: var(--color-purple); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <p style="margin-top: 1rem; color: var(--color-text-muted); font-size: 0.95rem;">Cargando programas académicos oficiales...</p>
+        </div>
       </div>
 
       <!-- Nota Institucional Normativa (Slide 6 SOMEP) -->
@@ -362,6 +240,263 @@
 
     </div>
   </section>
+
+  <!-- ======================================================================
+       SECCIÓN: COMUNIDAD Y MEMBRESÍAS SOMEP (SILVER & GOLD)
+       ====================================================================== -->
+  <span id="comunidad-membresias" class="nav-anchor" aria-hidden="true"></span>
+  <section class="memberships-section" id="membresias" aria-labelledby="memberships-title">
+    <div class="container">
+      
+      <div class="section-badge-center">
+        <span class="membership-pill">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          PROGRAMA DE AFILIACIÓN Y MEMBRESÍAS INSTITUCIONALES
+        </span>
+      </div>
+
+      <div class="memberships-header-block">
+        <h2 id="memberships-title" class="memberships-main-title">
+          Membresías
+        </h2>
+        <p class="memberships-lead">
+          Forme parte de la red de actualización médica y científica líder en péptidos y medicina de precisión en México.
+          Acceda a <strong>descuentos preferenciales del 30% y 40% en todos los péptidos de nuestro catálogo</strong>, tarifas especiales en programas académicos y canales directos de interconsulta clínica.
+        </p>
+      </div>
+
+      <!-- Cuadrícula de Membresías -->
+      <div class="memberships-grid">
+
+        <!-- Tarjeta Membresía Silver -->
+        <article class="membership-card membership-silver">
+          <div class="membership-badge-top">
+            <span class="tier-tag tier-silver">NIVEL PROFESIONAL</span>
+          </div>
+          
+          <div class="membership-media-wrap">
+            <img src="assets/images/membresia-silver.jpg" alt="Flyer Oficial Membresía Silver SOMEP" class="membership-flyer-img" loading="lazy">
+            <button type="button" class="btn-zoom-flyer" data-flyer="silver" aria-label="Ver volante oficial de Membresía Silver en alta resolución">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+              <span>Ver Volante Oficial</span>
+            </button>
+          </div>
+
+          <div class="membership-card-content">
+            <div class="membership-title-row">
+              <h3 class="membership-tier-name">Membresía Silver</h3>
+              <span class="membership-society">SOMEP</span>
+            </div>
+
+            <!-- Bloque de Precio -->
+            <div class="membership-price-box">
+              <div class="price-amount-wrap">
+                <span class="price-val">$999</span>
+                <span class="price-curr">MXN</span>
+              </div>
+              <span class="price-period">Costo Anual Institucional</span>
+            </div>
+
+            <!-- Gran Destacado de Descuento -->
+            <div class="membership-discount-banner discount-silver">
+              <span class="discount-percent">30% DE DESCUENTO</span>
+              <span class="discount-scope">en todos los péptidos del catálogo</span>
+            </div>
+
+            <!-- Lista de Beneficios -->
+            <ul class="membership-benefits-list">
+              <li>
+                <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="#006847" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span><strong>30% de descuento directo</strong> en todos los péptidos del catálogo.</span>
+              </li>
+              <li>
+                <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="#006847" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span><strong>Forma parte de SOMEP</strong> con registro y número de afiliación profesional.</span>
+              </li>
+              <li>
+                <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="#006847" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span>Acceso preferente al catálogo interactivo y fichas de investigación clínica.</span>
+              </li>
+              <li>
+                <svg class="check-icon" viewBox="0 0 24 24" width="18" height="18" fill="#006847" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span>Canal de atención médica y vinculación directa para pedidos y dudas.</span>
+              </li>
+            </ul>
+
+            <!-- Botón de Compra / WhatsApp -->
+            <div class="membership-action">
+              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20deseo%20adquirir%20la%20Membres%C3%ADa%20Silver%20(%24999%20MXN%2Fanual)%20y%20solicitar%20informaci%C3%B3n%20para%20el%20pago%20y%20registro." 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 class="btn-membership-whatsapp btn-silver-wa">
+                <svg class="wa-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.188 8.188 0 012.41 5.82c0 4.54-3.7 8.24-8.24 8.24-1.41 0-2.8-.36-4.02-1.05l-.29-.16-3.11.82.83-3.04-.19-.31c-.76-1.25-1.16-2.69-1.16-4.18 0-4.54 3.7-8.24 8.24-8.24zm4.5 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.07s.89 2.4 1.02 2.57c.13.17 1.76 2.68 4.26 3.76.6.26 1.06.41 1.42.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.23-.19-.48-.31z"/>
+                </svg>
+                <span>Solicitar Membresía Silver vía WhatsApp</span>
+              </a>
+              <p class="membership-action-sub">
+                Informes y vinculación: <a href="https://wa.me/525579247494" target="_blank" rel="noopener noreferrer"><strong>55 7924 7494</strong></a>
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- Tarjeta Membresía Gold -->
+        <article class="membership-card membership-gold featured-tier">
+          <div class="membership-badge-top">
+            <span class="tier-tag tier-gold">★ MÁS COMPLETA & RECOMENDADA</span>
+          </div>
+
+          <div class="membership-media-wrap">
+            <img src="assets/images/membresia-gold.jpg" alt="Flyer Oficial Membresía Gold SOMEP" class="membership-flyer-img" loading="lazy">
+            <button type="button" class="btn-zoom-flyer btn-zoom-gold" data-flyer="gold" aria-label="Ver volante oficial de Membresía Gold en alta resolución">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+              <span>Ver Volante Oficial</span>
+            </button>
+          </div>
+
+          <div class="membership-card-content">
+            <div class="membership-title-row">
+              <h3 class="membership-tier-name">Membresía Gold</h3>
+              <span class="membership-society gold-society">SOMEP PREMIUM</span>
+            </div>
+
+            <!-- Bloque de Precio -->
+            <div class="membership-price-box gold-price-box">
+              <div class="price-amount-wrap">
+                <span class="price-val">$1,999</span>
+                <span class="price-curr">MXN</span>
+              </div>
+              <span class="price-period">Costo Anual Institucional</span>
+            </div>
+
+            <!-- Gran Destacado de Descuento -->
+            <div class="membership-discount-banner discount-gold">
+              <span class="discount-percent">40% DE DESCUENTO</span>
+              <span class="discount-scope">en todos nuestros péptidos del catálogo</span>
+            </div>
+
+            <!-- Lista de Beneficios -->
+            <ul class="membership-benefits-list">
+              <li>
+                <svg class="check-icon check-gold" viewBox="0 0 24 24" width="18" height="18" fill="#C5A059" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span><strong>40% de descuento</strong> en todos nuestros péptidos del catálogo.</span>
+              </li>
+              <li>
+                <svg class="check-icon check-gold" viewBox="0 0 24 24" width="18" height="18" fill="#C5A059" aria-hidden="true">
+                  <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                </svg>
+                <span><strong>Descuento especial</strong> en seminarios y diplomados de la Academia SOMEP.</span>
+              </li>
+              <li>
+                <svg class="check-icon check-gold" viewBox="0 0 24 24" width="18" height="18" fill="#006847" aria-hidden="true">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.188 8.188 0 012.41 5.82c0 4.54-3.7 8.24-8.24 8.24-1.41 0-2.8-.36-4.02-1.05l-.29-.16-3.11.82.83-3.04-.19-.31c-.76-1.25-1.16-2.69-1.16-4.18 0-4.54 3.7-8.24 8.24-8.24zm4.5 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.07s.89 2.4 1.02 2.57c.13.17 1.76 2.68 4.26 3.76.6.26 1.06.41 1.42.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.23-.19-.48-.31z"/>
+                </svg>
+                <span><strong>Acceso a grupo de WhatsApp para apoyo</strong>, resolución de casos e interconsulta médica.</span>
+              </li>
+              <li>
+                <svg class="check-icon check-gold" viewBox="0 0 24 24" width="18" height="18" fill="#C5A059" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span><strong>Forma parte de SOMEP</strong> con constancia foliada de membresía y valor curricular.</span>
+              </li>
+              <li>
+                <svg class="check-icon check-gold" viewBox="0 0 24 24" width="18" height="18" fill="#C5A059" aria-hidden="true">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <span>Acceso prioritario a lanzamientos y eventos científicos exclusivos.</span>
+              </li>
+            </ul>
+
+            <!-- Botón de Compra / WhatsApp -->
+            <div class="membership-action">
+              <a href="https://wa.me/525579247494?text=Hola%20SOMEP%2C%20deseo%20adquirir%20la%20Membres%C3%ADa%20Gold%20(%241%2C999%20MXN%2Fanual)%20y%20solicitar%20informaci%C3%B3n%20para%20el%20pago%20y%20registro." 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 class="btn-membership-whatsapp btn-gold-wa">
+                <svg class="wa-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.188 8.188 0 012.41 5.82c0 4.54-3.7 8.24-8.24 8.24-1.41 0-2.8-.36-4.02-1.05l-.29-.16-3.11.82.83-3.04-.19-.31c-.76-1.25-1.16-2.69-1.16-4.18 0-4.54 3.7-8.24 8.24-8.24zm4.5 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.07s.89 2.4 1.02 2.57c.13.17 1.76 2.68 4.26 3.76.6.26 1.06.41 1.42.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.23-.19-.48-.31z"/>
+                </svg>
+                <span>Solicitar Membresía Gold vía WhatsApp</span>
+              </a>
+              <p class="membership-action-sub">
+                Informes y vinculación: <a href="https://wa.me/525579247494" target="_blank" rel="noopener noreferrer"><strong>55 7924 7494</strong></a>
+              </p>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Pasos de Activación Rápida -->
+      <div class="membership-process-box">
+        <h4 class="process-box-title">¿Cómo formar parte de SOMEP en 3 sencillos pasos?</h4>
+        <div class="process-steps-grid">
+          <div class="process-step">
+            <span class="step-num">1</span>
+            <div class="step-content">
+              <strong>Selecciona tu Membresía</strong>
+              <p>Elige nivel Silver ($999 MXN) o Gold ($1,999 MXN) de acuerdo a tu ejercicio médico y objetivos académicos.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <span class="step-num">2</span>
+            <div class="step-content">
+              <strong>Solicita tu Registro por WhatsApp</strong>
+              <p>Da clic en el botón de WhatsApp para contactar a vinculación SOMEP, recibir datos de registro y cuentas oficiales.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <span class="step-num">3</span>
+            <div class="step-content">
+              <strong>Activa tus Beneficios Inmediatos</strong>
+              <p>Recibe tu constancia institucional de miembro, tu código de descuento en el catálogo y acceso al grupo médico (Gold).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal para Visualizar Volante Oficial en Alta Resolución -->
+  <div id="flyer-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="flyer-modal-title" hidden>
+    <div class="modal-container flyer-modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="category-badge" id="flyer-modal-badge">Membresía Oficial SOMEP</span>
+          <h2 id="flyer-modal-title" class="modal-compound-name">Volante Oficial de Membresía</h2>
+        </div>
+        <button type="button" id="flyer-modal-close-btn" class="modal-close-btn" aria-label="Cerrar volante">&times;</button>
+      </div>
+      <div class="flyer-modal-body">
+        <img id="flyer-modal-img" src="" alt="Volante oficial SOMEP" class="flyer-zoom-img">
+      </div>
+      <div class="modal-footer flyer-modal-footer">
+        <a id="flyer-modal-wa-btn" href="https://wa.me/525579247494" target="_blank" rel="noopener noreferrer" class="btn-membership-whatsapp">
+          <svg class="wa-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.188 8.188 0 012.41 5.82c0 4.54-3.7 8.24-8.24 8.24-1.41 0-2.8-.36-4.02-1.05l-.29-.16-3.11.82.83-3.04-.19-.31c-.76-1.25-1.16-2.69-1.16-4.18 0-4.54 3.7-8.24 8.24-8.24zm4.5 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.07s.89 2.4 1.02 2.57c.13.17 1.76 2.68 4.26 3.76.6.26 1.06.41 1.42.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.23-.19-.48-.31z"/></svg>
+          <span id="flyer-modal-wa-text">Solicitar por WhatsApp</span>
+        </a>
+        <button type="button" class="btn-secondary" id="flyer-modal-close-btn-bottom">Cerrar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Accesible para Vista de Detalle y Ficha Ampliada -->
   <div id="detail-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
@@ -503,8 +638,8 @@
       <div class="footer-col links-col">
         <h4 class="footer-heading">Líneas de Desarrollo</h4>
         <ul class="footer-links">
-          <li><a href="#contacto" class="footer-nav-link">Comunidad y Membresías</a></li>
-          <li><a href="#academia" class="footer-nav-link footer-highlight-link">Academia y Cursos con Constancia</a></li>
+          <li><a href="#membresias" class="footer-nav-link">Membresías</a></li>
+          <li><a href="#academia" class="footer-nav-link footer-highlight-link">Cursos</a></li>
           <li><a href="#catalogo" class="footer-nav-link">Portafolio Científico Documentado</a></li>
           <li><a href="#catalogo" class="footer-nav-link">Criterios de Elegibilidad y Trazabilidad</a></li>
           <li><a href="/admin/login.html" class="footer-nav-link" rel="nofollow">Acceso Administrativo</a></li>
@@ -540,6 +675,6 @@
   </footer>
 
   <!-- JavaScript Vanilla Modular -->
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=1.0.2"></script>
 </body>
 </html>

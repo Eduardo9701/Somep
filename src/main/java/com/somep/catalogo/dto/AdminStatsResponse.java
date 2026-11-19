@@ -6,15 +6,25 @@ public class AdminStatsResponse {
 
     private long totalCompuestos;
     private long totalCategorias;
+    private long totalCursos;
     private LocalDateTime ultimaActualizacion;
 
     public AdminStatsResponse() {
     }
 
-    public AdminStatsResponse(long totalCompuestos, long totalCategorias, LocalDateTime ultimaActualizacion) {
+    public AdminStatsResponse(long totalCompuestos, long totalCategorias, long totalCursos, LocalDateTime ultimaActualizacion) {
         this.totalCompuestos = totalCompuestos;
         this.totalCategorias = totalCategorias;
+        this.totalCursos = totalCursos;
         this.ultimaActualizacion = ultimaActualizacion;
+    }
+
+    public long getTotalCursos() {
+        return totalCursos;
+    }
+
+    public void setTotalCursos(long totalCursos) {
+        this.totalCursos = totalCursos;
     }
 
     public long getTotalCompuestos() {

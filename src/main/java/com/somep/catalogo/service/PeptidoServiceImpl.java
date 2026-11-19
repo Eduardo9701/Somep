@@ -19,9 +19,12 @@ import java.util.stream.Collectors;
 public class PeptidoServiceImpl implements PeptidoService {
 
     private final PeptidoRepository peptidoRepository;
+    private final com.somep.catalogo.repository.CursoRepository cursoRepository;
 
-    public PeptidoServiceImpl(PeptidoRepository peptidoRepository) {
+    public PeptidoServiceImpl(PeptidoRepository peptidoRepository,
+                              com.somep.catalogo.repository.CursoRepository cursoRepository) {
         this.peptidoRepository = peptidoRepository;
+        this.cursoRepository = cursoRepository;
     }
 
     @Override
@@ -132,9 +135,10 @@ public class PeptidoServiceImpl implements PeptidoService {
     public AdminStatsResponse obtenerEstadisticas() {
         long totalCompuestos = peptidoRepository.count();
         long totalCategorias = peptidoRepository.findDistinctCategorias().size();
+        long totalCursos = cursoRepository.count();
         LocalDateTime ultimaActualizacion = peptidoRepository.findMaxFechaActualizacion()
                 .orElse(LocalDateTime.now());
 
-        return new AdminStatsResponse(totalCompuestos, totalCategorias, ultimaActualizacion);
+        return new AdminStatsResponse(totalCompuestos, totalCategorias, totalCursos, ultimaActualizacion);
     }
 }
