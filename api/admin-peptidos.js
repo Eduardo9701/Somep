@@ -1,5 +1,5 @@
-const pool = require('../db');
-const { getSessionUser } = require('../auth-helper');
+const pool = require('./db');
+const { getSessionUser } = require('./auth-helper');
 
 function mapPeptido(row) {
   return {

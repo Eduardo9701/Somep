@@ -4,43 +4,43 @@
   "rewrites": [
     {
       "source": "/api/auth/login",
-      "destination": "/api/auth/login"
+      "destination": "/api/auth-login"
     },
     {
       "source": "/api/auth/me",
-      "destination": "/api/auth/me"
+      "destination": "/api/auth-me"
     },
     {
       "source": "/api/auth/logout",
-      "destination": "/api/auth/logout"
+      "destination": "/api/auth-logout"
     },
     {
       "source": "/api/auth/csrf",
-      "destination": "/api/auth/csrf"
+      "destination": "/api/auth-csrf"
     },
     {
       "source": "/api/admin/peptidos/stats",
-      "destination": "/api/admin/stats"
+      "destination": "/api/admin-stats"
     },
     {
       "source": "/api/admin/peptidos/upload-imagen",
-      "destination": "/api/admin/upload-imagen"
+      "destination": "/api/admin-upload"
     },
     {
       "source": "/api/admin/peptidos/:id",
-      "destination": "/api/admin/peptidos?id=:id"
+      "destination": "/api/admin-peptidos?id=:id"
     },
     {
       "source": "/api/admin/peptidos",
-      "destination": "/api/admin/peptidos"
+      "destination": "/api/admin-peptidos"
     },
     {
       "source": "/api/admin/cursos/:id",
-      "destination": "/api/admin/cursos?id=:id"
+      "destination": "/api/admin-cursos?id=:id"
     },
     {
       "source": "/api/admin/cursos",
-      "destination": "/api/admin/cursos"
+      "destination": "/api/admin-cursos"
     },
     {
       "source": "/api/peptidos/categorias",

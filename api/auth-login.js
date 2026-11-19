@@ -1,6 +1,6 @@
-const pool = require('../db');
+const pool = require('./db');
 const bcrypt = require('bcryptjs');
-const { signToken } = require('../auth-helper');
+const { signToken } = require('./auth-helper');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -63,7 +63,6 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Actualizar último acceso
     try {
       await pool.query('UPDATE usuarios SET ultimo_acceso = NOW() WHERE id = ?', [usuario.id]);
     } catch (ignoreErr) {}
@@ -74,7 +73,7 @@ module.exports = async (req, res) => {
       email: usuario.email,
       nombreCompleto: usuario.nombre_completo,
       role: usuario.rol || 'ROLE_ADMIN',
-      exp: Date.now() + 24 * 60 * 60 * 1000 // 24 horas
+      exp: Date.now() + 24 * 60 * 60 * 1000
     };
 
     const token = signToken(payload);

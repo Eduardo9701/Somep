@@ -1,4 +1,4 @@
-const { getSessionUser } = require('../auth-helper');
+const { getSessionUser } = require('./auth-helper');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,8 +15,6 @@ module.exports = async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized', mensaje: 'Sesión no autorizada o expirada' });
   }
 
-  // En entorno serverless de Vercel, si se envía una URL o archivo
-  // Las imágenes del catálogo normalmente se almacenan en /assets/images/ o URLs directas
   return res.status(200).json({
     url: '/assets/images/wolverine.jpeg',
     nombre: 'imagen.jpg',

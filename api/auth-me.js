@@ -1,4 +1,4 @@
-const { getSessionUser } = require('../auth-helper');
+const { getSessionUser } = require('./auth-helper');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

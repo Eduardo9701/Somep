@@ -1,5 +1,5 @@
-const pool = require('../db');
-const { getSessionUser } = require('../auth-helper');
+const pool = require('./db');
+const { getSessionUser } = require('./auth-helper');
 
 function mapCurso(row) {
   return {
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
 
   const { id } = req.query;
 
-  // GET: listar todos los cursos (incluye inactivos)
+  // GET: listar todos los cursos
   if (req.method === 'GET') {
     try {
       const [rows] = await pool.query('SELECT * FROM cursos ORDER BY orden ASC, id ASC');
