@@ -1,0 +1,14 @@
+{
+  "name": "somep-catalogo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SOMEP Catálogo Interactivo y Glosario Médico-Educativo",
+  "main": "api/peptidos.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "mysql2": "^3.11.5"
+  }
+}

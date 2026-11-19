@@ -25,6 +25,14 @@ buildNumber.properties
 .env
 *.local
 *.log
+node_modules/
+
+# Database Backups & Data Dumps
+database/backup*
+database/*.csv
+*.sql.gz
+
+
 
 # Dynamic Uploads
 uploads/*
