@@ -188,20 +188,20 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  gap: 1.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  gap: 1.25rem;
 }
 
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.7rem;
 }
 
 .brand-logo {
-  width: 52px;
-  height: 52px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
   background: transparent;
   border: none;
@@ -217,28 +217,28 @@ a {
 
 .brand-acronym {
   font-family: var(--font-brand);
-  font-size: 1.65rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-purple);
   line-height: 1;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .brand-tagline {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--color-green);
-  letter-spacing: 1.8px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
 }
 
 .brand-sub {
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   color: var(--color-text-muted);
   font-weight: 400;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 
 /* Navegación del Header */
@@ -2207,12 +2207,12 @@ a {
 
 @media (max-width: 480px) {
   .brand-acronym {
-    font-size: 1.4rem;
+    font-size: 1.15rem;
   }
 
   .brand-tagline {
-    font-size: 0.7rem;
-    letter-spacing: 1px;
+    font-size: 0.6rem;
+    letter-spacing: 0.8px;
   }
 
   .hero-stats {
